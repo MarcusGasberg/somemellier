@@ -1,0 +1,30 @@
+services:
+  marketeers_postgres:
+    image: postgres:16.2-alpine
+    shm_size: 1g
+    user: postgres
+    restart: always
+    healthcheck:
+      test: 'pg_isready -U user --dbname=postgres' # Updated database name here
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: username
+      POSTGRES_DB: postgres # Changed database name from postgres to marketeers_db
+      POSTGRES_PASSWORD: password
+    command: |
+      postgres 
+      -c wal_level=logical
+      -c max_wal_senders=10 
+      -c max_replication_slots=5 
+      -c hot_standby=on 
+      -c hot_standby_feedback=on
+    volumes:
+      - marketeers_pgdata:/var/lib/postgresql/data
+
+volumes:
+  marketeers_pgdata:
+    driver: local
