@@ -8,7 +8,7 @@ export const Route = createFileRoute("/")({
 });
 
 export const metadata = {
-  title: "SocialPulse - Social Media Marketing Platform",
+  title: "Somemellier - Social Media Marketing Platform",
   description:
     "Amplify your social media strategy with AI-powered insights and management tools",
 };
@@ -23,7 +23,7 @@ function RouteComponent() {
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <Zap className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-bold text-lg">SocialPulse</span>
+            <span className="font-bold text-lg">Somemellier</span>
           </div>
           <div className="hidden md:flex items-center gap-8">
             <a
@@ -229,7 +229,7 @@ function RouteComponent() {
                 <div className="w-6 h-6 bg-primary rounded-lg flex items-center justify-center">
                   <Zap className="w-4 h-4 text-primary-foreground" />
                 </div>
-                <span className="font-bold">SocialPulse</span>
+                <span className="font-bold">Somemellier</span>
               </div>
               <p className="text-sm text-muted-foreground">
                 Your all-in-one social media command center.
@@ -326,7 +326,7 @@ function RouteComponent() {
 
           <div className="border-t border-border pt-8 flex flex-col sm:flex-row justify-between items-center">
             <p className="text-sm text-muted-foreground">
-              ©{new Date().getFullYear()} SocialPulse. All rights reserved.
+              ©{new Date().getFullYear()} Somemellier. All rights reserved.
             </p>
             <div className="flex gap-6 text-sm text-muted-foreground mt-4 sm:mt-0">
               <a href="#" className="hover:text-foreground transition-colors">

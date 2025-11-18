@@ -28,11 +28,11 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "Marketeers",
+        title: "Somemellier",
       },
       ...seo({
         title: "Markeeters| AI First Social Media Marketing",
-        description: `Marketeers is an AI first social media marketing platform for planning, managing, and creating marketing material for social media.`,
+        description: `Somemellier is an AI first social media marketing platform for planning, managing, and creating marketing material for social media.`,
         keywords: [
           "AI",
           "Social Media",

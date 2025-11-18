@@ -1,5 +1,5 @@
 services:
-  marketeers_postgres:
+  somemellier_postgres:
     image: postgres:16.2-alpine
     shm_size: 1g
     user: postgres
@@ -13,7 +13,7 @@ services:
       - 5432:5432
     environment:
       POSTGRES_USER: username
-      POSTGRES_DB: postgres # Changed database name from postgres to marketeers_db
+      POSTGRES_DB: postgres # Changed database name from postgres to somemellier_db
       POSTGRES_PASSWORD: password
     command: |
       postgres 
@@ -23,8 +23,8 @@ services:
       -c hot_standby=on 
       -c hot_standby_feedback=on
     volumes:
-      - marketeers_pgdata:/var/lib/postgresql/data
+      - somemellier_pgdata:/var/lib/postgresql/data
 
 volumes:
-  marketeers_pgdata:
+  somemellier_pgdata:
     driver: local
