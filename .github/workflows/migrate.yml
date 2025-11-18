@@ -17,5 +17,5 @@ jobs:
 
       - name: Run Drizzle migrations
         env:
-          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: bunx drizzle-kit migrate
