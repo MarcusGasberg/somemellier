@@ -88,9 +88,12 @@ function RouteComponent() {
 								<Button
 									size="lg"
 									className="bg-primary hover:bg-accent text-primary-foreground"
+									asChild
 								>
-									{t("hero.startFreeTrial")}
-									<ArrowRight className="ml-2 w-5 h-5" />
+									<Link to="/dashboard">
+										{t("hero.startFreeTrial")}
+										<ArrowRight className="ml-2 w-5 h-5" />
+									</Link>
 								</Button>
 								<Button size="lg" variant="outline">
 									{t("hero.watchDemo")}
