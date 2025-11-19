@@ -1,14 +1,17 @@
 import { config } from "dotenv";
-import { env } from "cloudflare:workers";
 
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
+import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-http";
 
-import * as schema from "./schema.ts";
+import * as schema from "./schema";
+import { must } from "@/lib/must.ts";
 
 config();
 
-const pool = new Pool({
-  connectionString: env.DATABASE_URL || process.env.DATABASE_URL!,
-});
-export const db = drizzle(pool, { schema });
+const connectionString = must(
+	process.env.DATABASE_URL,
+	"DATABASE_URL must be set",
+);
+
+const sql = neon(connectionString);
+export const db = drizzle({ client: sql, schema });

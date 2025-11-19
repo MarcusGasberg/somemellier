@@ -8,7 +8,7 @@ import {
 	Sparkles,
 } from "lucide-react";
 
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/")({
@@ -50,11 +50,15 @@ function RouteComponent() {
 						</a>
 					</div>
 					<div className="flex items-center gap-3">
-						<Button variant="ghost" size="sm">
-							{t("nav.signIn")}
+						<Button variant="ghost" size="sm" asChild>
+							<Link to="/login">{t("nav.signIn")}</Link>
 						</Button>
-						<Button size="sm" className="bg-primary hover:bg-primary/90">
-							{t("nav.getStarted")}
+						<Button
+							size="sm"
+							className="bg-primary hover:bg-primary/90"
+							asChild
+						>
+							<Link to="/register">{t("nav.getStarted")}</Link>
 						</Button>
 					</div>
 				</div>

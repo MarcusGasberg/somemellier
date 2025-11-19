@@ -3,10 +3,12 @@ import { initReactI18next } from "react-i18next";
 
 // Import translations
 import indexEn from "../../public/locales/en/index.json";
+import authEn from "../../public/locales/en/auth.json";
 
 const resources = {
 	en: {
 		index: indexEn,
+		auth: authEn,
 	},
 };
 
