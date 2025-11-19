@@ -1,7 +1,7 @@
 import {
-  HeadContent,
-  Scripts,
-  createRootRouteWithContext,
+	HeadContent,
+	Scripts,
+	createRootRouteWithContext,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
@@ -9,73 +9,74 @@ import { TanStackDevtools } from "@tanstack/react-devtools";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 
 import appCss from "../styles.css?url";
+import "../lib/i18n";
 
 import type { QueryClient } from "@tanstack/react-query";
 import { seo } from "@/lib/seo";
 
 interface MyRouterContext {
-  queryClient: QueryClient;
+	queryClient: QueryClient;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
-  head: () => ({
-    meta: [
-      {
-        charSet: "utf-8",
-      },
-      {
-        name: "viewport",
-        content: "width=device-width, initial-scale=1",
-      },
-      {
-        title: "Somemellier",
-      },
-      ...seo({
-        title: "Markeeters| AI First Social Media Marketing",
-        description: `Somemellier is an AI first social media marketing platform for planning, managing, and creating marketing material for social media.`,
-        keywords: [
-          "AI",
-          "Social Media",
-          "Marketing",
-          "Platform",
-          "Content Creation",
-          "Marketing Management",
-        ],
-      }),
-    ],
-    links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
-    ],
-  }),
+	head: () => ({
+		meta: [
+			{
+				charSet: "utf-8",
+			},
+			{
+				name: "viewport",
+				content: "width=device-width, initial-scale=1",
+			},
+			{
+				title: "Somemellier",
+			},
+			...seo({
+				title: "Markeeters| AI First Social Media Marketing",
+				description: `Somemellier is an AI first social media marketing platform for planning, managing, and creating marketing material for social media.`,
+				keywords: [
+					"AI",
+					"Social Media",
+					"Marketing",
+					"Platform",
+					"Content Creation",
+					"Marketing Management",
+				],
+			}),
+		],
+		links: [
+			{
+				rel: "stylesheet",
+				href: appCss,
+			},
+		],
+	}),
 
-  shellComponent: RootDocument,
+	shellComponent: RootDocument,
 });
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <TanStackDevtools
-          config={{
-            position: "bottom-right",
-          }}
-          plugins={[
-            {
-              name: "Tanstack Router",
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-            TanStackQueryDevtools,
-          ]}
-        />
-        <Scripts />
-      </body>
-    </html>
-  );
+	return (
+		<html lang="en">
+			<head>
+				<HeadContent />
+			</head>
+			<body>
+				{children}
+				<TanStackDevtools
+					config={{
+						position: "bottom-right",
+					}}
+					plugins={[
+						{
+							name: "Tanstack Router",
+							render: <TanStackRouterDevtoolsPanel />,
+						},
+						TanStackQueryDevtools,
+					]}
+				/>
+				<Scripts />
+			</body>
+		</html>
+	);
 }
