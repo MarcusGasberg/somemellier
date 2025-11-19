@@ -7,7 +7,8 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 function RouteComponent() {
+	const { data: session } = authClient.useSession();
 	const logout = () => authClient.signOut();
 
-	return <Dashboard onLogout={logout} />;
+	return <Dashboard user={session?.user} onLogout={logout} />;
 }

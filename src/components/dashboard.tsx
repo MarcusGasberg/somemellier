@@ -16,7 +16,15 @@ import { Button } from "./ui/button";
 import { PostCard } from "./post-card";
 import { AIPanel } from "./ai-panel";
 
+interface User {
+	id: string;
+	name: string;
+	email: string;
+	image?: string | null;
+}
+
 interface DashboardProps {
+	user?: User;
 	onLogout: () => void;
 }
 
@@ -98,7 +106,7 @@ const INITIAL_POSTS: DashboardPost[] = [
 	},
 ];
 
-export const Dashboard = ({ onLogout }: DashboardProps) => {
+export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 	const [dates, setDates] = useState<DashboardDate[]>([]);
 	const [posts, setPosts] = useState(INITIAL_POSTS);
 	const [isAiModalOpen, setAiModalOpen] = useState(false);
@@ -162,11 +170,18 @@ export const Dashboard = ({ onLogout }: DashboardProps) => {
 				<div className="mt-auto p-4 border-t border-border">
 					<div className="flex items-center gap-3 px-2 mb-4">
 						<div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-xs">
-							JD
+							{user?.name
+								? user.name
+										.split(" ")
+										.map((n) => n[0])
+										.join("")
+										.toUpperCase()
+										.slice(0, 2)
+								: "U"}
 						</div>
 						<div className="flex-1">
 							<div className="text-sm text-foreground font-medium">
-								Jane Doe
+								{user?.name || "User"}
 							</div>
 							<div className="text-xs text-muted-foreground">Pro Plan</div>
 						</div>
