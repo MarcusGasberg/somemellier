@@ -107,13 +107,32 @@ const INITIAL_POSTS: DashboardPost[] = [
 ];
 
 export const Dashboard = ({ user, onLogout }: DashboardProps) => {
-	const [dates, setDates] = useState<DashboardDate[]>([]);
+	const [dates] = useState<DashboardDate[]>(() => generateDates(21));
 	const [posts, setPosts] = useState(INITIAL_POSTS);
 	const [isAiModalOpen, setAiModalOpen] = useState(false);
-	const scrollContainerRef = useRef(null);
+	const scrollContainerRef = useRef<HTMLDivElement>(null);
+	const headerScrollRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		setDates(generateDates(21)); // Generate 3 weeks
+		const bodyScroll = scrollContainerRef.current;
+		const headerScroll = headerScrollRef.current;
+
+		if (!bodyScroll || !headerScroll) return;
+
+		const syncScroll = (source: HTMLElement, target: HTMLElement) => {
+			target.scrollLeft = source.scrollLeft;
+		};
+
+		const handleBodyScroll = () => syncScroll(bodyScroll, headerScroll);
+		const handleHeaderScroll = () => syncScroll(headerScroll, bodyScroll);
+
+		bodyScroll.addEventListener("scroll", handleBodyScroll);
+		headerScroll.addEventListener("scroll", handleHeaderScroll);
+
+		return () => {
+			bodyScroll.removeEventListener("scroll", handleBodyScroll);
+			headerScroll.removeEventListener("scroll", handleHeaderScroll);
+		};
 	}, []);
 
 	const handleAiGeneration = (
@@ -239,13 +258,8 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 							Channels
 						</div>
 						<div
-							className="flex-1 overflow-hidden"
-							ref={(el) => {
-								if (el && scrollContainerRef.current) {
-									// Sync header scroll with body scroll if implemented separately,
-									// but here we will put dates inside the main scroll area for simplicity or use CSS grid.
-								}
-							}}
+							className="flex-1 overflow-x-auto overflow-y-hidden"
+							ref={headerScrollRef}
 						>
 							<div
 								className="flex"
@@ -286,7 +300,10 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 					</div>
 
 					{/* Scrollable Swimlane Body */}
-					<div className="flex-1 overflow-auto" ref={scrollContainerRef}>
+					<div
+						className="flex-1 overflow-x-auto overflow-y-auto"
+						ref={scrollContainerRef}
+					>
 						<div className="flex flex-col min-w-max">
 							{CHANNELS.map((channel) => (
 								<div
