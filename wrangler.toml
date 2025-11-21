@@ -1,4 +1,5 @@
   name = "somemelier"
+  account_id = "30bbed3e2af4600e181f925db979eb9d"
   compatibility_date = "2025-09-02"
   compatibility_flags = ["nodejs_compat"]
   main = "@tanstack/react-start/server-entry"

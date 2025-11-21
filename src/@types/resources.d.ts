@@ -132,6 +132,36 @@ interface Resources {
 			signIn: "Sign in";
 		};
 	};
+	dashboard: {
+		actions: {
+			generate: "Generate";
+			newPost: "New Post";
+		};
+		brand: "SocialAI";
+		channels: {
+			postsScheduled: "3 posts scheduled this week";
+			title: "Channels";
+		};
+		header: {
+			campaign: "Q4 Growth Push";
+			title: "Campaign Overview";
+		};
+		menu: {
+			analytics: "Analytics";
+			calendar: "Calendar";
+			dashboard: "Dashboard";
+			mentions: "Mentions";
+			title: "Menu";
+		};
+		timeline: {
+			emptySlot: "Empty Slot";
+			today: "TODAY";
+		};
+		user: {
+			plan: "Pro Plan";
+			signOut: "Sign Out";
+		};
+	};
 }
 
 export default Resources;

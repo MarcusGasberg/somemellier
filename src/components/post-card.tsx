@@ -12,9 +12,9 @@ interface PostCardProps {
 
 export const PostCard = ({ post }: PostCardProps) => {
 	const statusColors = {
-		published: "bg-secondary text-secondary-foreground border-secondary",
-		scheduled: "bg-primary/10 text-primary border-primary/20",
-		draft: "bg-muted text-muted-foreground border-border",
+		published: "bg-emerald-50 text-emerald-700 border-emerald-200",
+		scheduled: "bg-sky-50 text-sky-700 border-sky-200",
+		draft: "bg-stone-50 text-stone-600 border-stone-200",
 	} as const;
 
 	return (

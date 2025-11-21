@@ -1,0 +1,30 @@
+{
+  "brand": "SocialAI",
+  "menu": {
+    "title": "Menu",
+    "dashboard": "Dashboard",
+    "calendar": "Calendar",
+    "mentions": "Mentions",
+    "analytics": "Analytics"
+  },
+  "user": {
+    "plan": "Pro Plan",
+    "signOut": "Sign Out"
+  },
+  "header": {
+    "title": "Campaign Overview",
+    "campaign": "Q4 Growth Push"
+  },
+  "actions": {
+    "generate": "Generate",
+    "newPost": "New Post"
+  },
+  "channels": {
+    "title": "Channels",
+    "postsScheduled": "3 posts scheduled this week"
+  },
+  "timeline": {
+    "emptySlot": "Empty Slot",
+    "today": "TODAY"
+  }
+}
