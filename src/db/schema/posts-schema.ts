@@ -14,6 +14,7 @@ import {
 import { z } from "zod";
 import { user } from "./auth-schema";
 import { channels } from "./channels-schema";
+import { campaigns } from "./campaigns-schema";
 
 export const postStatusEnum = pgEnum("post_status", [
 	"draft",
@@ -30,6 +31,9 @@ export const posts = pgTable("posts", {
 	channelId: text("channel_id")
 		.notNull()
 		.references(() => channels.id, { onDelete: "cascade" }),
+	campaignId: text("campaign_id").references(() => campaigns.id, {
+		onDelete: "set null",
+	}),
 	title: text("title"),
 	content: text("content").notNull(),
 	status: postStatusEnum("status").default("draft").notNull(),

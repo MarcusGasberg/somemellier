@@ -22,6 +22,13 @@
       "when": 1763924881655,
       "tag": "0002_massive_rictor",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1763928517018,
+      "tag": "0003_ambitious_goliath",
+      "breakpoints": true
     }
   ]
 }

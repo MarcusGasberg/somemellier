@@ -2,7 +2,7 @@ import { QueryClient } from "@tanstack/query-core";
 import { createCollection, eq } from "@tanstack/react-db";
 import { queryCollectionOptions } from "@tanstack/query-db-collection";
 import { useLiveQuery } from "@tanstack/react-db";
-import { Post, NewPost } from "@/db/schema/posts-schema";
+import { Post } from "@/db/schema/posts-schema";
 
 const queryClient = new QueryClient();
 
@@ -35,12 +35,20 @@ export const postCollection = createCollection(
 	}),
 );
 
-export const usePosts = (channelId?: string) => {
-	return useLiveQuery((q) =>
-		q
-			.from({ posts: postCollection })
-			.where((q) => eq(q.posts.channelId, channelId)),
-	);
+export const usePosts = (channelId?: string, campaignId?: string) => {
+	return useLiveQuery((q) => {
+		let query = q.from({ posts: postCollection });
+
+		if (channelId) {
+			query = query.where((q) => eq(q.posts.channelId, channelId));
+		}
+
+		if (campaignId) {
+			query = query.where((q) => eq(q.posts.campaignId, campaignId));
+		}
+
+		return query;
+	});
 };
 
 // export const useCreatePost = () => {

@@ -14,9 +14,12 @@ import { PostCard } from "./post-card";
 import { AIPanel } from "./ai-panel";
 import { ChannelIcon } from "./channel-icon";
 import { ChannelConnectionModal } from "./channel-connection-modal";
+import { CampaignSelectorModal } from "./campaign-selector-modal";
 import { userChannelCollection } from "@/hooks/use-user-channels";
 import { usePosts } from "@/hooks/use-posts";
+import { useCurrentCampaign, useCampaigns } from "@/hooks/use-campaigns";
 import { useLiveQuery } from "@tanstack/react-db";
+import type { Campaign } from "@/db/schema/campaigns-schema";
 
 interface User {
 	id: string;
@@ -63,12 +66,17 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 	const [dates] = useState<DashboardDate[]>(() => generateDates(21));
 	const [isAiModalOpen, setAiModalOpen] = useState(false);
 	const [isChannelModalOpen, setChannelModalOpen] = useState(false);
+	const [isCampaignModalOpen, setCampaignModalOpen] = useState(false);
+	const [currentCampaign, setCurrentCampaign] = useState<Campaign | null>(null);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const headerScrollRef = useRef<HTMLDivElement>(null);
+	const hasAttemptedDefaultCreation = useRef(false);
 	const { data: userChannels, isLoading: userChannelsIsLoading } = useLiveQuery(
 		(q) => q.from({ userChannels: userChannelCollection }),
 	);
-	const { data: posts = [] } = usePosts();
+	const { data: currentCampaignData } = useCurrentCampaign();
+	const { data: allCampaigns = [] } = useCampaigns();
+	const { data: posts = [] } = usePosts(undefined, currentCampaign?.id);
 
 	useEffect(() => {
 		const bodyScroll = scrollContainerRef.current;
@@ -92,11 +100,53 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 		};
 	}, []);
 
+	useEffect(() => {
+		if (
+			currentCampaignData &&
+			currentCampaignData.length > 0 &&
+			!currentCampaign
+		) {
+			setCurrentCampaign(currentCampaignData[0]);
+		} else if (
+			currentCampaignData.length === 0 &&
+			user?.id &&
+			!currentCampaign &&
+			!hasAttemptedDefaultCreation.current
+		) {
+			hasAttemptedDefaultCreation.current = true;
+			// Create default campaign for new users
+			fetch("/api/campaigns", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					name: "Default",
+					description: "Your default campaign",
+					isDefault: true,
+				}),
+			})
+				.then((response) => response.json())
+				.then((data: any) => {
+					setCurrentCampaign(data.campaign);
+				})
+				.catch((error) => {
+					console.error("Failed to create default campaign:", error);
+					hasAttemptedDefaultCreation.current = false; // Reset on error to allow retry
+				});
+		}
+	}, [currentCampaignData, currentCampaign, allCampaigns, user?.id]);
+
 	const handleAiGeneration = (
 		generatedPosts: { channelId: string; content: string; type: string }[],
 	) => {
 		// TODO: Implement AI post generation with real API
 		console.log("Generated posts:", generatedPosts);
+	};
+
+	const handleCampaignSelect = (campaign: Campaign) => {
+		setCurrentCampaign(campaign);
+		setCampaignModalOpen(false);
 	};
 
 	return (
@@ -179,13 +229,17 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 							{t("header.title")}
 						</h1>
 						<div className="h-6 w-px bg-border"></div>
-						<div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary text-foreground text-sm font-medium  border border-secondary-100">
+						<button
+							type="button"
+							onClick={() => setCampaignModalOpen(true)}
+							className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary text-foreground text-sm font-medium border border-secondary-100 hover:bg-secondary/80 transition-colors cursor-pointer"
+						>
 							<span className="relative flex h-2 w-2">
 								<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
 								<span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
 							</span>
-							<span>{t("header.campaign")}</span>
-						</div>
+							<span>{currentCampaign?.name || t("header.campaign")}</span>
+						</button>
 					</div>
 
 					<div className="flex items-center gap-3">
@@ -398,6 +452,11 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 					onClose={() => setChannelModalOpen(false)}
 				/>
 			)}
+			<CampaignSelectorModal
+				isOpen={isCampaignModalOpen}
+				onClose={() => setCampaignModalOpen(false)}
+				onSelectCampaign={handleCampaignSelect}
+			/>
 		</div>
 	);
 };

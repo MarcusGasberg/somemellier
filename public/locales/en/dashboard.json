@@ -11,10 +11,16 @@
     "plan": "Pro Plan",
     "signOut": "Sign Out"
   },
-  "header": {
-    "title": "Campaign Overview",
-    "campaign": "Q4 Growth Push"
-  },
+   "header": {
+    "campaign": "Q4 Growth Push",
+    "title": "Campaign Overview"
+   },
+   "campaigns": {
+    "select": "Select Campaign",
+    "create": "Create New Campaign",
+    "default": "Default",
+    "namePlaceholder": "Enter campaign name"
+   },
   "actions": {
     "generate": "Generate",
     "newPost": "New Post"

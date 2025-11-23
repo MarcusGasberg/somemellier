@@ -24,7 +24,18 @@ interface Resources {
       "newPost": "New Post"
     },
     "brand": "SocialAI",
+    "campaigns": {
+      "create": "Create New Campaign",
+      "default": "Default",
+      "namePlaceholder": "Enter campaign name",
+      "select": "Select Campaign"
+    },
     "channels": {
+      "empty": {
+        "connectButton": "Connect Account",
+        "description": "Connect your social media accounts to start scheduling\nposts across different platforms.",
+        "title": "No channels connected"
+      },
       "postsScheduled": "3 posts scheduled this week",
       "title": "Channels"
     },

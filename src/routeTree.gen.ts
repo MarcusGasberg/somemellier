@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiUserChannelsRouteImport } from './routes/api/user-channels'
 import { Route as ApiPostsRouteImport } from './routes/api/posts'
 import { Route as ApiChannelsRouteImport } from './routes/api/channels'
+import { Route as ApiCampaignsRouteImport } from './routes/api/campaigns'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const TestRoute = TestRouteImport.update({
@@ -59,6 +60,11 @@ const ApiChannelsRoute = ApiChannelsRouteImport.update({
   path: '/api/channels',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCampaignsRoute = ApiCampaignsRouteImport.update({
+  id: '/api/campaigns',
+  path: '/api/campaigns',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/test': typeof TestRoute
+  '/api/campaigns': typeof ApiCampaignsRoute
   '/api/channels': typeof ApiChannelsRoute
   '/api/posts': typeof ApiPostsRoute
   '/api/user-channels': typeof ApiUserChannelsRoute
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/test': typeof TestRoute
+  '/api/campaigns': typeof ApiCampaignsRoute
   '/api/channels': typeof ApiChannelsRoute
   '/api/posts': typeof ApiPostsRoute
   '/api/user-channels': typeof ApiUserChannelsRoute
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/test': typeof TestRoute
+  '/api/campaigns': typeof ApiCampaignsRoute
   '/api/channels': typeof ApiChannelsRoute
   '/api/posts': typeof ApiPostsRoute
   '/api/user-channels': typeof ApiUserChannelsRoute
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/test'
+    | '/api/campaigns'
     | '/api/channels'
     | '/api/posts'
     | '/api/user-channels'
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/test'
+    | '/api/campaigns'
     | '/api/channels'
     | '/api/posts'
     | '/api/user-channels'
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/test'
+    | '/api/campaigns'
     | '/api/channels'
     | '/api/posts'
     | '/api/user-channels'
@@ -141,6 +153,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
   TestRoute: typeof TestRoute
+  ApiCampaignsRoute: typeof ApiCampaignsRoute
   ApiChannelsRoute: typeof ApiChannelsRoute
   ApiPostsRoute: typeof ApiPostsRoute
   ApiUserChannelsRoute: typeof ApiUserChannelsRoute
@@ -205,6 +218,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChannelsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/campaigns': {
+      id: '/api/campaigns'
+      path: '/api/campaigns'
+      fullPath: '/api/campaigns'
+      preLoaderRoute: typeof ApiCampaignsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -221,6 +241,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
   TestRoute: TestRoute,
+  ApiCampaignsRoute: ApiCampaignsRoute,
   ApiChannelsRoute: ApiChannelsRoute,
   ApiPostsRoute: ApiPostsRoute,
   ApiUserChannelsRoute: ApiUserChannelsRoute,
