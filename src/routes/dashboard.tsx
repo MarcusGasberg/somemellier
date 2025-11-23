@@ -1,5 +1,5 @@
 import { authClient } from "@/lib/auth-client";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { Dashboard } from "@/components/dashboard";
 import { userChannelCollection } from "@/hooks/use-user-channels";
 
@@ -14,7 +14,13 @@ export const Route = createFileRoute("/dashboard")({
 
 function RouteComponent() {
 	const { data: session } = authClient.useSession();
-	const logout = () => authClient.signOut();
+	const router = useRouter();
+	const logout = () => {
+		authClient.signOut();
+		router.navigate({
+			to: "/login",
+		});
+	};
 
 	return <Dashboard user={session?.user} onLogout={logout} />;
 }

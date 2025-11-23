@@ -270,12 +270,18 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 									<div className="text-center space-y-4">
 										<div className="text-6xl">📺</div>
 										<h3 className="text-xl font-semibold text-foreground">
-											No channels connected
+											{t("channels.empty.title")}
 										</h3>
 										<p className="text-muted-foreground max-w-md">
-											Connect your social media accounts to start scheduling
-											posts across different platforms.
+											{t("channels.empty.description")}
 										</p>
+										<Button
+											onClick={() => setChannelModalOpen(true)}
+											className="mt-4"
+										>
+											<Plus className="w-4 h-4 mr-2" />
+											{t("channels.empty.connectButton")}
+										</Button>
 									</div>
 								</div>
 							) : (
@@ -362,18 +368,20 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 								))
 							)}
 							{/* Add Channel Button */}
-							<div className="flex border-b border-border min-h-[180px]">
-								{/* Channel Column (Sticky Left) */}
-								<div className="sticky left-0 w-48 shrink-0 bg-card border-r border-border p-4 z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
-									<button
-										type="button"
-										onClick={() => setChannelModalOpen(true)}
-										className="text-sm text-muted-foreground font-medium flex items-center justify-center gap-2 w-full h-full hover:text-primary hover:bg-primary/10 transition-colors duration-300 rounded-md"
-									>
-										<Plus className="w-8 h-8" />
-									</button>
+							{userChannels.length !== 0 && (
+								<div className="flex border-b border-border min-h-[180px]">
+									{/* Channel Column (Sticky Left) */}
+									<div className="sticky left-0 w-48 shrink-0 bg-card border-r border-border p-4 z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+										<button
+											type="button"
+											onClick={() => setChannelModalOpen(true)}
+											className="text-sm text-muted-foreground font-medium flex items-center justify-center gap-2 w-full h-full hover:text-primary hover:bg-primary/10 transition-colors duration-300 rounded-md"
+										>
+											<Plus className="w-8 h-8" />
+										</button>
+									</div>
 								</div>
-							</div>
+							)}
 						</div>
 					</div>
 				</div>

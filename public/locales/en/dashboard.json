@@ -21,7 +21,12 @@
   },
   "channels": {
     "title": "Channels",
-    "postsScheduled": "3 posts scheduled this week"
+    "postsScheduled": "3 posts scheduled this week",
+    "empty": {
+      "title": "No channels connected",
+      "description": "Connect your social media accounts to start scheduling\nposts across different platforms.",
+      "connectButton": "Connect Account"
+    }
   },
   "timeline": {
     "emptySlot": "Empty Slot",

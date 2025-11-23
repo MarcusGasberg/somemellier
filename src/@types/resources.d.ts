@@ -25,7 +25,6 @@ interface Resources {
     },
     "brand": "SocialAI",
     "channels": {
-      "add": "Add Channel",
       "postsScheduled": "3 posts scheduled this week",
       "title": "Channels"
     },
