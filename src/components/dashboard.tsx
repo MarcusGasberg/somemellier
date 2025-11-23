@@ -6,7 +6,6 @@ import {
 	Plus,
 	Settings,
 	Sparkles,
-	X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -14,6 +13,10 @@ import { Button } from "./ui/button";
 import { PostCard } from "./post-card";
 import { AIPanel } from "./ai-panel";
 import { ChannelIcon } from "./channel-icon";
+import { ChannelConnectionModal } from "./channel-connection-modal";
+import { userChannelCollection } from "@/hooks/use-user-channels";
+import { usePosts } from "@/hooks/use-posts";
+import { useLiveQuery } from "@tanstack/react-db";
 
 interface User {
 	id: string;
@@ -27,14 +30,7 @@ interface DashboardProps {
 	onLogout: () => void;
 }
 
-const CHANNELS = [
-	{ id: "x", name: "X", iconKey: "x" },
-	{ id: "instagram", name: "Instagram", iconKey: "instagram" },
-	{ id: "linkedin", name: "LinkedIn", iconKey: "linkedin" },
-	{ id: "tiktok", name: "TikTok", iconKey: "tiktok" },
-	{ id: "facebook", name: "Facebook", iconKey: "facebook" },
-	{ id: "youtube", name: "YouTube", iconKey: "youtube" },
-];
+// Channels are now fetched from the API
 
 interface DashboardDate {
 	full: Date;
@@ -42,15 +38,6 @@ interface DashboardDate {
 	dayNum: number;
 	month: string;
 	iso: string;
-}
-
-interface DashboardPost {
-	id: number;
-	channelId: string;
-	date: string; // ISO date string
-	content: string;
-	status: "published" | "scheduled" | "draft";
-	type: string;
 }
 
 const generateDates = (days = 14): DashboardDate[] => {
@@ -69,40 +56,20 @@ const generateDates = (days = 14): DashboardDate[] => {
 	}
 	return dates;
 };
-const INITIAL_POSTS: DashboardPost[] = [
-	{
-		id: 1,
-		channelId: "twitter",
-		date: generateDates()[0].iso,
-		content: "Excited to announce our new features! 🚀 #SaaS",
-		status: "published",
-		type: "announcement",
-	},
-	{
-		id: 2,
-		channelId: "linkedin",
-		date: generateDates()[2].iso,
-		content: "Here are 5 tips for better productivity.",
-		status: "scheduled",
-		type: "educational",
-	},
-	{
-		id: 3,
-		channelId: "instagram",
-		date: generateDates()[1].iso,
-		content: "Behind the scenes at the office today.",
-		status: "draft",
-		type: "bts",
-	},
-];
+// Posts are now fetched from the API
 
 export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 	const { t } = useTranslation("dashboard");
 	const [dates] = useState<DashboardDate[]>(() => generateDates(21));
-	const [posts, setPosts] = useState(INITIAL_POSTS);
 	const [isAiModalOpen, setAiModalOpen] = useState(false);
+	const [isChannelModalOpen, setChannelModalOpen] = useState(false);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const headerScrollRef = useRef<HTMLDivElement>(null);
+
+	const { data: userChannels } = useLiveQuery((q) =>
+		q.from({ userChannels: userChannelCollection }),
+	);
+	const { data: posts = [] } = usePosts();
 
 	useEffect(() => {
 		const bodyScroll = scrollContainerRef.current;
@@ -129,22 +96,8 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 	const handleAiGeneration = (
 		generatedPosts: { channelId: string; content: string; type: string }[],
 	) => {
-		// Auto-schedule generated posts to the first available empty slot for that channel
-		const newPosts: DashboardPost[] = generatedPosts.map((p, idx) => {
-			// Simple logic: Schedule 1, 2, 3 days from today
-			const targetDate = dates[idx + 1]?.iso || dates[0].iso;
-			return {
-				...p,
-				id: Date.now() + idx,
-				date: targetDate,
-				status: "draft",
-			};
-		});
-		setPosts([...posts, ...newPosts]);
-	};
-
-	const deletePost = (id: number) => {
-		setPosts(posts.filter((p) => p.id !== id));
+		// TODO: Implement AI post generation with real API
+		console.log("Generated posts:", generatedPosts);
 	};
 
 	return (
@@ -168,13 +121,22 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 					>
 						<Layout size={18} /> {t("menu.dashboard")}
 					</button>
-					<button className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium hover:text-foreground hover:bg-secondary/30 rounded-lg transition-colors">
+					<button
+						type="button"
+						className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium hover:text-foreground hover:bg-secondary/30 rounded-lg transition-colors"
+					>
 						<Calendar size={18} /> {t("menu.calendar")}
 					</button>
-					<button className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium hover:text-foreground hover:bg-secondary/30 rounded-lg transition-colors">
+					<button
+						type="button"
+						className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium hover:text-foreground hover:bg-secondary/30 rounded-lg transition-colors"
+					>
 						<MessageSquare size={18} /> {t("menu.mentions")}
 					</button>
-					<button className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium hover:text-foreground hover:bg-secondary/30 rounded-lg transition-colors">
+					<button
+						type="button"
+						className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium hover:text-foreground hover:bg-secondary/30 rounded-lg transition-colors"
+					>
 						<BarChart3 size={18} /> {t("menu.analytics")}
 					</button>
 				</div>
@@ -201,6 +163,7 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 						</div>
 					</div>
 					<button
+						type="button"
 						onClick={onLogout}
 						className="w-full flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors px-2"
 					>
@@ -228,7 +191,10 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 					</div>
 
 					<div className="flex items-center gap-3">
-						<button className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-lg transition-colors">
+						<button
+							type="button"
+							className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
+						>
 							<Settings size={20} />
 						</button>
 						<Button
@@ -301,84 +267,113 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 						ref={scrollContainerRef}
 					>
 						<div className="flex flex-col min-w-max">
-							{CHANNELS.map((channel) => (
-								<div
-									key={channel.id}
-									className="flex border-b border-border min-h-[180px]"
-								>
-									{/* Channel Column (Sticky Left) */}
-									<div className="sticky left-0 w-48 shrink-0 bg-card border-r border-border p-4 z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
-										<div className="flex items-center gap-3 mb-2">
-											<div className="p-2 bg-secondary/40 rounded-lg border border-border">
-												<ChannelIcon iconKey={channel.iconKey} />
-											</div>
-											<span className="font-semibold text-foreground">
-												{channel.name}
-											</span>
-										</div>
-										<div className="text-xs text-muted-foreground pl-1">
-											{t("channels.postsScheduled")}
-										</div>
-									</div>
-
-									{/* Timeline Grid */}
-									<div
-										className="flex"
-										style={{ width: `${dates.length * 200}px` }}
-									>
-										{dates.map((date) => {
-											const dayPosts = posts.filter(
-												(p) =>
-													p.channelId === channel.id && p.date === date.iso,
-											);
-											const isToday = new Date().getDate() === date.dayNum;
-
-											return (
-												<div
-													key={`${channel.id}-${date.iso}`}
-													className={`w-[200px] shrink-0 p-3 border-r border-border relative group transition-colors hover:bg-secondary/10 ${isToday ? "bg-primary/5 hover:bg-secondary/30" : ""}`}
-												>
-													{/* Add Button (Hidden until hover) */}
-													<button
-														type="button"
-														className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-primary transition-all"
-													>
-														<Plus size={16} />
-													</button>
-
-													{/* Posts */}
-													<div className="space-y-2">
-														{dayPosts.map((post) => (
-															<div
-																key={post.id}
-																className="relative group/card"
-															>
-																<PostCard post={post} />
-																<button
-																	type="button"
-																	onClick={() => deletePost(post.id)}
-																	className="absolute -top-1 -right-1 bg-card rounded-full p-0.5 shadow-sm border border-border opacity-0 group-hover/card:opacity-100 text-destructive hover:text-destructive"
-																>
-																	<X size={12} />
-																</button>
-															</div>
-														))}
-													</div>
-
-													{/* Empty State Placeholder */}
-													{dayPosts.length === 0 && (
-														<div className="h-full flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
-															<div className="text-muted-foreground text-xs border border-dashed border-border px-3 py-1 rounded-full">
-																{t("timeline.emptySlot")}
-															</div>
-														</div>
-													)}
-												</div>
-											);
-										})}
+							{userChannels.length === 0 ? (
+								<div className="flex-1 flex items-center justify-center min-h-[400px]">
+									<div className="text-center space-y-4">
+										<div className="text-6xl">📺</div>
+										<h3 className="text-xl font-semibold text-foreground">
+											No channels connected
+										</h3>
+										<p className="text-muted-foreground max-w-md">
+											Connect your social media accounts to start scheduling
+											posts across different platforms.
+										</p>
 									</div>
 								</div>
-							))}
+							) : (
+								userChannels.map((channel) => (
+									<div
+										key={channel.id}
+										className="flex border-b border-border min-h-[180px]"
+									>
+										{/* Channel Column (Sticky Left) */}
+										<div className="sticky left-0 w-48 shrink-0 bg-card border-r border-border p-4 z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+											<div className="flex items-center gap-3 mb-2">
+												<div className="p-2 bg-secondary/40 rounded-lg border border-border">
+													<ChannelIcon iconKey={channel.iconKey} />
+												</div>
+												<span className="font-semibold text-foreground">
+													{channel.name}
+												</span>
+												{channel.accountId && (
+													<span className="text-xs text-muted-foreground bg-secondary px-2 py-1 rounded">
+														@{channel.accountId}
+													</span>
+												)}
+											</div>
+											<div className="text-xs text-muted-foreground pl-1">
+												{t("channels.postsScheduled")}
+											</div>
+										</div>
+
+										{/* Timeline Grid */}
+										<div
+											className="flex"
+											style={{ width: `${dates.length * 200}px` }}
+										>
+											{dates.map((date) => {
+												const dayPosts = posts.filter(
+													(p) =>
+														p.channelId === channel.id &&
+														p.scheduledAt &&
+														p.scheduledAt.toISOString().split("T")[0] ===
+															date.iso,
+												);
+												const isToday = new Date().getDate() === date.dayNum;
+
+												return (
+													<div
+														key={`${channel.id}-${date.iso}`}
+														className={`w-[200px] shrink-0 p-3 border-r border-border relative group transition-colors hover:bg-secondary/10 ${isToday ? "bg-primary/5 hover:bg-secondary/30" : ""}`}
+													>
+														{/* Add Button (Hidden until hover) */}
+														<button
+															type="button"
+															className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-primary transition-all"
+														>
+															<Plus size={16} />
+														</button>
+
+														{/* Posts */}
+														<div className="space-y-2">
+															{dayPosts.map((post) => (
+																<div
+																	key={post.id}
+																	className="relative group/card"
+																>
+																	<PostCard
+																		post={{ ...post, type: post.postType }}
+																	/>
+																</div>
+															))}
+														</div>
+
+														{/* Empty State Placeholder */}
+														{dayPosts.length === 0 && (
+															<div className="h-full flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
+																<div className="text-muted-foreground text-xs border border-dashed border-border px-3 py-1 rounded-full">
+																	{t("timeline.emptySlot")}
+																</div>
+															</div>
+														)}
+													</div>
+												);
+											})}
+										</div>
+									</div>
+								))
+							)}
+							{/* Add Channel Button */}
+							<div className="flex border-b border-border min-h-[180px] items-center justify-center">
+								<Button
+									variant="outline"
+									onClick={() => setChannelModalOpen(true)}
+									className="text-sm"
+								>
+									<Plus className="w-4 h-4 mr-2" />
+									Add Channel
+								</Button>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -388,6 +383,11 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 				isOpen={isAiModalOpen}
 				onClose={() => setAiModalOpen(false)}
 				onGenerate={handleAiGeneration}
+			/>
+
+			<ChannelConnectionModal
+				isOpen={isChannelModalOpen}
+				onClose={() => setChannelModalOpen(false)}
 			/>
 		</div>
 	);

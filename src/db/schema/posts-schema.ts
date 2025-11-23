@@ -6,6 +6,12 @@ import {
 	integer,
 	pgEnum,
 } from "drizzle-orm/pg-core";
+import {
+	createSelectSchema,
+	createInsertSchema,
+	createUpdateSchema,
+} from "drizzle-zod";
+import { z } from "zod";
 import { user } from "./auth-schema";
 import { channels } from "./channels-schema";
 
@@ -52,3 +58,21 @@ export const postVersions = pgTable("post_versions", {
 	version: integer("version").notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// Zod schemas
+export const postsSelectSchema = createSelectSchema(posts);
+export const postsInsertSchema = createInsertSchema(posts);
+export const postsUpdateSchema = createUpdateSchema(posts);
+
+export const postVersionsSelectSchema = createSelectSchema(postVersions);
+export const postVersionsInsertSchema = createInsertSchema(postVersions);
+export const postVersionsUpdateSchema = createUpdateSchema(postVersions);
+
+// Types
+export type Post = z.infer<typeof postsSelectSchema>;
+export type NewPost = z.infer<typeof postsInsertSchema>;
+export type UpdatePost = z.infer<typeof postsUpdateSchema>;
+
+export type PostVersion = z.infer<typeof postVersionsSelectSchema>;
+export type NewPostVersion = z.infer<typeof postVersionsInsertSchema>;
+export type UpdatePostVersion = z.infer<typeof postVersionsUpdateSchema>;

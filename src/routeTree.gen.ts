@@ -14,6 +14,9 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiUserChannelsRouteImport } from './routes/api/user-channels'
+import { Route as ApiPostsRouteImport } from './routes/api/posts'
+import { Route as ApiChannelsRouteImport } from './routes/api/channels'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const TestRoute = TestRouteImport.update({
@@ -41,6 +44,21 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiUserChannelsRoute = ApiUserChannelsRouteImport.update({
+  id: '/api/user-channels',
+  path: '/api/user-channels',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPostsRoute = ApiPostsRouteImport.update({
+  id: '/api/posts',
+  path: '/api/posts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiChannelsRoute = ApiChannelsRouteImport.update({
+  id: '/api/channels',
+  path: '/api/channels',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -53,6 +71,9 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/test': typeof TestRoute
+  '/api/channels': typeof ApiChannelsRoute
+  '/api/posts': typeof ApiPostsRoute
+  '/api/user-channels': typeof ApiUserChannelsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +82,9 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/test': typeof TestRoute
+  '/api/channels': typeof ApiChannelsRoute
+  '/api/posts': typeof ApiPostsRoute
+  '/api/user-channels': typeof ApiUserChannelsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
@@ -70,6 +94,9 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/test': typeof TestRoute
+  '/api/channels': typeof ApiChannelsRoute
+  '/api/posts': typeof ApiPostsRoute
+  '/api/user-channels': typeof ApiUserChannelsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
@@ -80,9 +107,21 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/test'
+    | '/api/channels'
+    | '/api/posts'
+    | '/api/user-channels'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/login' | '/register' | '/test' | '/api/auth/$'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/login'
+    | '/register'
+    | '/test'
+    | '/api/channels'
+    | '/api/posts'
+    | '/api/user-channels'
+    | '/api/auth/$'
   id:
     | '__root__'
     | '/'
@@ -90,6 +129,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/test'
+    | '/api/channels'
+    | '/api/posts'
+    | '/api/user-channels'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
@@ -99,6 +141,9 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
   TestRoute: typeof TestRoute
+  ApiChannelsRoute: typeof ApiChannelsRoute
+  ApiPostsRoute: typeof ApiPostsRoute
+  ApiUserChannelsRoute: typeof ApiUserChannelsRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -139,6 +184,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/user-channels': {
+      id: '/api/user-channels'
+      path: '/api/user-channels'
+      fullPath: '/api/user-channels'
+      preLoaderRoute: typeof ApiUserChannelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/posts': {
+      id: '/api/posts'
+      path: '/api/posts'
+      fullPath: '/api/posts'
+      preLoaderRoute: typeof ApiPostsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/channels': {
+      id: '/api/channels'
+      path: '/api/channels'
+      fullPath: '/api/channels'
+      preLoaderRoute: typeof ApiChannelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -155,6 +221,9 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
   TestRoute: TestRoute,
+  ApiChannelsRoute: ApiChannelsRoute,
+  ApiPostsRoute: ApiPostsRoute,
+  ApiUserChannelsRoute: ApiUserChannelsRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

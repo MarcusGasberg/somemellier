@@ -1,9 +1,16 @@
 import { Dashboard } from "@/components/dashboard";
+import { userChannelCollection } from "@/hooks/use-user-channels";
 import { authClient } from "@/lib/auth-client";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/dashboard")({
 	component: RouteComponent,
+	loader: async () => {
+		// Preload the collection in the loader
+		// TODO: FIND OUT WHY THIS DOESNT WORK ON CLOUDFLARE WORKERS
+		// await userChannelCollection.preload();
+		return null;
+	},
 });
 
 function RouteComponent() {
