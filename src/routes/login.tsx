@@ -15,7 +15,7 @@ function LoginComponent() {
 	const handleGoogleSignIn = async () => {
 		await authClient.signIn.social({
 			provider: "google",
-			callbackURL: "/",
+			callbackURL: "/dashboard",
 		});
 	};
 
