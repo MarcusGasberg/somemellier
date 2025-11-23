@@ -10,6 +10,7 @@ import { Loader2 } from "lucide-react";
 import type { Channel } from "@/db/schema/channels-schema";
 
 interface ChannelConnectionModalProps {
+	userId: string;
 	isOpen: boolean;
 	onClose: () => void;
 }
@@ -17,6 +18,7 @@ interface ChannelConnectionModalProps {
 export const ChannelConnectionModal = ({
 	isOpen,
 	onClose,
+	userId,
 }: ChannelConnectionModalProps) => {
 	const { data: availableChannels = [], isLoading } = useAvailableChannels();
 	const [connectingChannelId, setConnectingChannelId] = useState<string | null>(
@@ -26,6 +28,7 @@ export const ChannelConnectionModal = ({
 	const handleConnect = async (channel: Channel) => {
 		setConnectingChannelId(channel.id);
 		try {
+			console.log(channel);
 			userChannelCollection.insert({
 				id: crypto.randomUUID(),
 				createdAt: new Date(),
@@ -33,6 +36,10 @@ export const ChannelConnectionModal = ({
 				name: channel.name,
 				type: channel.type,
 				updatedAt: new Date(),
+				accountId: null,
+				isActive: true,
+				channelId: channel.id,
+				userId: userId,
 			});
 			onClose();
 		} catch (error) {
@@ -41,6 +48,8 @@ export const ChannelConnectionModal = ({
 			setConnectingChannelId(null);
 		}
 	};
+
+	console.log(availableChannels);
 
 	return (
 		<Dialog open={isOpen} onOpenChange={onClose}>

@@ -65,9 +65,8 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 	const [isChannelModalOpen, setChannelModalOpen] = useState(false);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const headerScrollRef = useRef<HTMLDivElement>(null);
-
-	const { data: userChannels } = useLiveQuery((q) =>
-		q.from({ userChannels: userChannelCollection }),
+	const { data: userChannels, isLoading: userChannelsIsLoading } = useLiveQuery(
+		(q) => q.from({ userChannels: userChannelCollection }),
 	);
 	const { data: posts = [] } = usePosts();
 
@@ -171,7 +170,6 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 					</button>
 				</div>
 			</aside>
-
 			{/* Main Content */}
 			<main className="flex-1 flex flex-col h-screen overflow-hidden">
 				{/* Header */}
@@ -267,7 +265,7 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 						ref={scrollContainerRef}
 					>
 						<div className="flex flex-col min-w-max">
-							{userChannels.length === 0 ? (
+							{userChannels.length === 0 && !userChannelsIsLoading ? (
 								<div className="flex-1 flex items-center justify-center min-h-[400px]">
 									<div className="text-center space-y-4">
 										<div className="text-6xl">📺</div>
@@ -364,31 +362,34 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 								))
 							)}
 							{/* Add Channel Button */}
-							<div className="flex border-b border-border min-h-[180px] items-center justify-center">
-								<Button
-									variant="outline"
-									onClick={() => setChannelModalOpen(true)}
-									className="text-sm"
-								>
-									<Plus className="w-4 h-4 mr-2" />
-									Add Channel
-								</Button>
+							<div className="flex border-b border-border min-h-[180px]">
+								{/* Channel Column (Sticky Left) */}
+								<div className="sticky left-0 w-48 shrink-0 bg-card border-r border-border p-4 z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+									<button
+										type="button"
+										onClick={() => setChannelModalOpen(true)}
+										className="text-sm text-muted-foreground font-medium flex items-center justify-center gap-2 w-full h-full hover:text-primary hover:bg-primary/10 transition-colors duration-300 rounded-md"
+									>
+										<Plus className="w-8 h-8" />
+									</button>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 			</main>
-
 			<AIPanel
 				isOpen={isAiModalOpen}
 				onClose={() => setAiModalOpen(false)}
 				onGenerate={handleAiGeneration}
 			/>
-
-			<ChannelConnectionModal
-				isOpen={isChannelModalOpen}
-				onClose={() => setChannelModalOpen(false)}
-			/>
+			{user?.id && (
+				<ChannelConnectionModal
+					userId={user.id}
+					isOpen={isChannelModalOpen}
+					onClose={() => setChannelModalOpen(false)}
+				/>
+			)}
 		</div>
 	);
 };

@@ -1,6 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { db } from "@/db";
-import { channels, userChannels } from "@/db/schema/channels-schema";
+import {
+	channels,
+	userChannels,
+	userChannelsInsertSchema,
+} from "@/db/schema/channels-schema";
 import { auth } from "@/lib/auth";
 import { eq, and } from "drizzle-orm";
 
@@ -66,8 +70,7 @@ export const Route = createFileRoute("/api/user-channels")({
 						});
 					}
 
-					const body: { channelId: string; accountId?: string } =
-						await request.json();
+					const body = userChannelsInsertSchema.parse(await request.json());
 
 					// Check if channel exists
 					const channel = await db
@@ -116,6 +119,7 @@ export const Route = createFileRoute("/api/user-channels")({
 							userId: session.user.id,
 							channelId: body.channelId,
 							accountId: body.accountId,
+							iconKey: channel[0].iconKey,
 							isActive: true,
 						})
 						.returning();

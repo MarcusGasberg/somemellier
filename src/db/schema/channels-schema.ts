@@ -42,6 +42,7 @@ export const userChannels = pgTable("user_channels", {
 		.notNull()
 		.references(() => channels.id, { onDelete: "cascade" }),
 	accountId: text("account_id"),
+	iconKey: text("icon_key").notNull(),
 	credentials: jsonb("credentials").$type<Record<string, any>>().default({}),
 	settings: jsonb("settings").$type<Record<string, any>>().default({}),
 	isActive: boolean("is_active").default(true).notNull(),
@@ -87,20 +88,26 @@ export const channelsUpdateSchema = z.object({
 export const userChannelsSelectSchema = z.object({
 	id: z.string(),
 	userId: z.string(),
+	name: z.string(),
+	type: channelTypeSchema,
 	channelId: z.string(),
 	accountId: z.string().nullable(),
 	credentials: z.record(z.string(), z.any()).optional(),
 	settings: z.record(z.string(), z.any()).optional(),
+	iconKey: z.string(),
 	isActive: z.boolean(),
 	createdAt: z.date(),
 	updatedAt: z.date(),
 });
 
 export const userChannelsInsertSchema = z.object({
-	id: z.string().optional(),
+	id: z.string(),
 	userId: z.string(),
+	name: z.string().optional(),
+	type: channelTypeSchema,
 	channelId: z.string(),
-	accountId: z.string().optional(),
+	accountId: z.string().nullable(),
+	iconKey: z.string(),
 	credentials: z.record(z.string(), z.any()).optional(),
 	settings: z.record(z.string(), z.any()).optional(),
 	isActive: z.boolean().optional(),
@@ -109,10 +116,13 @@ export const userChannelsInsertSchema = z.object({
 export const userChannelsUpdateSchema = z.object({
 	id: z.string().optional(),
 	userId: z.string().optional(),
+	name: z.string().optional(),
+	type: channelTypeSchema.optional(),
 	channelId: z.string().optional(),
 	accountId: z.string().nullable().optional(),
 	credentials: z.record(z.string(), z.any()).optional(),
 	settings: z.record(z.string(), z.any()).optional(),
+	iconKey: z.string().optional(),
 	isActive: z.boolean().optional(),
 	createdAt: z.date().optional(),
 	updatedAt: z.date().optional(),
@@ -120,7 +130,6 @@ export const userChannelsUpdateSchema = z.object({
 
 // Types
 export type Channel = z.infer<typeof channelsSelectSchema>;
-export type NewChannel = z.infer<typeof channelsInsertSchema>;
 export type UpdateChannel = z.infer<typeof channelsUpdateSchema>;
 
 export type UserChannel = z.infer<typeof userChannelsSelectSchema>;
