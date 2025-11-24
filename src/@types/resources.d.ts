@@ -51,7 +51,9 @@ interface Resources {
       "title": "Menu"
     },
     "timeline": {
+      "drafts": "Drafts",
       "emptySlot": "Empty Slot",
+      "showDrafts": "Show Drafts",
       "today": "TODAY"
     },
     "user": {

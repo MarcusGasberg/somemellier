@@ -1,6 +1,7 @@
 import {
 	BarChart3,
 	Calendar,
+	FileText,
 	Layout,
 	MessageSquare,
 	Plus,
@@ -68,6 +69,7 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 	const [isChannelModalOpen, setChannelModalOpen] = useState(false);
 	const [isCampaignModalOpen, setCampaignModalOpen] = useState(false);
 	const [currentCampaign, setCurrentCampaign] = useState<Campaign | null>(null);
+	const [showDrafts, setShowDrafts] = useState(false);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const headerScrollRef = useRef<HTMLDivElement>(null);
 	const hasAttemptedDefaultCreation = useRef(false);
@@ -245,6 +247,20 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 					<div className="flex items-center gap-3">
 						<button
 							type="button"
+							onClick={() => setShowDrafts(!showDrafts)}
+							className={`p-2 rounded-lg transition-colors ${
+								showDrafts
+									? "text-primary bg-primary/10"
+									: "text-muted-foreground hover:text-primary hover:bg-primary/5"
+							}`}
+							title={
+								showDrafts ? t("timeline.drafts") : t("timeline.showDrafts")
+							}
+						>
+							<FileText size={20} />
+						</button>
+						<button
+							type="button"
 							className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
 						>
 							<Settings size={20} />
@@ -277,8 +293,22 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 						>
 							<div
 								className="flex"
-								style={{ width: `${dates.length * 200}px` }}
+								style={{
+									width: `${dates.length * 200 + (showDrafts ? 200 : 0)}px`,
+								}}
 							>
+								{showDrafts && (
+									<div className="w-[200px] flex-shrink-0 p-3 border-r border-border bg-secondary/10">
+										<div className="text-xs font-medium uppercase mb-1 text-muted-foreground">
+											{t("timeline.drafts")}
+										</div>
+										<div className="flex items-center gap-2">
+											<span className="text-xl font-bold text-foreground">
+												<FileText size={20} />
+											</span>
+										</div>
+									</div>
+								)}
 								{dates.map((date) => {
 									const isToday = new Date().getDate() === date.dayNum;
 									return (
@@ -367,8 +397,51 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 										{/* Timeline Grid */}
 										<div
 											className="flex"
-											style={{ width: `${dates.length * 200}px` }}
+											style={{
+												width: `${dates.length * 200 + (showDrafts ? 200 : 0)}px`,
+											}}
 										>
+											{showDrafts && (
+												<div className="w-[200px] shrink-0 p-3 border-r border-border relative group transition-colors bg-secondary/5">
+													<button
+														type="button"
+														className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-primary transition-all"
+													>
+														<Plus size={16} />
+													</button>
+
+													<div className="space-y-2">
+														{posts
+															.filter(
+																(p) =>
+																	p.channelId === channel.id &&
+																	p.status === "draft",
+															)
+															.map((post) => (
+																<div
+																	key={post.id}
+																	className="relative group/card"
+																>
+																	<PostCard
+																		post={{ ...post, type: post.postType }}
+																	/>
+																</div>
+															))}
+													</div>
+
+													{posts.filter(
+														(p) =>
+															p.channelId === channel.id &&
+															p.status === "draft",
+													).length === 0 && (
+														<div className="h-full flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
+															<div className="text-muted-foreground text-xs border border-dashed border-border px-3 py-1 rounded-full">
+																{t("timeline.emptySlot")}
+															</div>
+														</div>
+													)}
+												</div>
+											)}
 											{dates.map((date) => {
 												const dayPosts = posts.filter(
 													(p) =>

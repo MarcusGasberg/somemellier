@@ -34,9 +34,11 @@
       "connectButton": "Connect Account"
     }
   },
-  "timeline": {
-    "emptySlot": "Empty Slot",
-    "today": "TODAY"
-  }
+   "timeline": {
+     "emptySlot": "Empty Slot",
+     "today": "TODAY",
+     "drafts": "Drafts",
+     "showDrafts": "Show Drafts"
+   }
 }
 
