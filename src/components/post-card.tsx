@@ -1,4 +1,4 @@
-import { CheckCircle, Clock } from "lucide-react";
+import { CheckCircle, Clock, Pencil } from "lucide-react";
 
 interface Post {
 	status: "published" | "scheduled" | "draft" | "failed";
@@ -8,9 +8,10 @@ interface Post {
 
 interface PostCardProps {
 	post: Post;
+	onEdit?: (e: React.MouseEvent) => void;
 }
 
-export const PostCard = ({ post }: PostCardProps) => {
+export const PostCard = ({ post, onEdit }: PostCardProps) => {
 	const statusColors = {
 		published: "bg-emerald-50 text-emerald-700 border-emerald-200",
 		scheduled: "bg-sky-50 text-sky-700 border-sky-200",
@@ -26,8 +27,23 @@ export const PostCard = ({ post }: PostCardProps) => {
 				<span className="font-semibold capitalize opacity-80">
 					{post.status}
 				</span>
-				{post.status === "published" && <CheckCircle size={12} />}
-				{post.status === "scheduled" && <Clock size={12} />}
+				<div className="flex items-center gap-2">
+					{post.status !== "published" && onEdit && (
+						<button
+							type="button"
+							onClick={(e) => {
+								e.stopPropagation();
+								onEdit(e);
+							}}
+							className="opacity-0 group-hover:opacity-100 p-1 hover:bg-black/5 rounded transition-all"
+							title="Edit post"
+						>
+							<Pencil size={12} />
+						</button>
+					)}
+					{post.status === "published" && <CheckCircle size={12} />}
+					{post.status === "scheduled" && <Clock size={12} />}
+				</div>
 			</div>
 			<p className="line-clamp-3 font-medium mb-2">{post.content}</p>
 			<div className="flex justify-between items-center text-[10px] opacity-70">

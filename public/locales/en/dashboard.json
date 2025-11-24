@@ -23,7 +23,9 @@
    },
   "actions": {
     "generate": "Generate",
-    "newPost": "New Post"
+    "newPost": "New Post",
+    "editPost": "Edit Post",
+    "updatePost": "Update Post"
   },
   "channels": {
     "title": "Channels",

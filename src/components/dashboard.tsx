@@ -16,11 +16,13 @@ import { AIPanel } from "./ai-panel";
 import { ChannelIcon } from "./channel-icon";
 import { ChannelConnectionModal } from "./channel-connection-modal";
 import { CampaignSelectorModal } from "./campaign-selector-modal";
+import { PostCreationModal } from "./post-creation-modal";
 import { userChannelCollection } from "@/hooks/use-user-channels";
 import { usePosts } from "@/hooks/use-posts";
 import { useCurrentCampaign, useCampaigns } from "@/hooks/use-campaigns";
 import { useLiveQuery } from "@tanstack/react-db";
 import type { Campaign } from "@/db/schema/campaigns-schema";
+import type { Post } from "@/db/schema/posts-schema";
 
 interface User {
 	id: string;
@@ -68,8 +70,10 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 	const [isAiModalOpen, setAiModalOpen] = useState(false);
 	const [isChannelModalOpen, setChannelModalOpen] = useState(false);
 	const [isCampaignModalOpen, setCampaignModalOpen] = useState(false);
+	const [isPostModalOpen, setPostModalOpen] = useState(false);
 	const [currentCampaign, setCurrentCampaign] = useState<Campaign | null>(null);
 	const [showDrafts, setShowDrafts] = useState(false);
+	const [editingPost, setEditingPost] = useState<Post | null>(null);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const headerScrollRef = useRef<HTMLDivElement>(null);
 	const hasAttemptedDefaultCreation = useRef(false);
@@ -149,6 +153,16 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 	const handleCampaignSelect = (campaign: Campaign) => {
 		setCurrentCampaign(campaign);
 		setCampaignModalOpen(false);
+	};
+
+	const handleEditPost = (post: Post) => {
+		setEditingPost(post);
+		setPostModalOpen(true);
+	};
+
+	const handleCreatePost = () => {
+		setEditingPost(null);
+		setPostModalOpen(true);
 	};
 
 	return (
@@ -273,7 +287,7 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 							<Sparkles className="w-4 h-4 mr-2" />
 							{t("actions.generate")}
 						</Button>
-						<Button className="text-sm h-9 px-4">
+						<Button className="text-sm h-9 px-4" onClick={handleCreatePost}>
 							<Plus className="w-4 h-4 mr-2" />
 							{t("actions.newPost")}
 						</Button>
@@ -424,6 +438,7 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 																>
 																	<PostCard
 																		post={{ ...post, type: post.postType }}
+																		onEdit={() => handleEditPost(post)}
 																	/>
 																</div>
 															))}
@@ -474,6 +489,7 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 																>
 																	<PostCard
 																		post={{ ...post, type: post.postType }}
+																		onEdit={() => handleEditPost(post)}
 																	/>
 																</div>
 															))}
@@ -530,6 +546,22 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 				onClose={() => setCampaignModalOpen(false)}
 				onSelectCampaign={handleCampaignSelect}
 			/>
+			{user?.id && currentCampaign && (
+				<PostCreationModal
+					isOpen={isPostModalOpen}
+					onClose={() => setPostModalOpen(false)}
+					onCreatePost={() => {
+						// Post creation/update is handled by the collection
+						// We just need to close the modal, which is handled by onClose in the modal
+						// But the modal calls onCreatePost, so we can use this to refresh or show toast
+						setPostModalOpen(false);
+					}}
+					currentCampaign={currentCampaign}
+					userId={user.id}
+					editMode={!!editingPost}
+					postToEdit={editingPost || undefined}
+				/>
+			)}
 		</div>
 	);
 };
