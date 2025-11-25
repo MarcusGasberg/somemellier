@@ -102,3 +102,8 @@ export const postsUpdateSchema = createUpdateSchema(posts).extend({
 			val === null ? null : typeof val === "string" ? new Date(val) : val,
 		),
 });
+
+// Types
+export type Post = z.infer<typeof postsSelectSchema>;
+export type NewPost = z.infer<typeof postsInsertSchema>;
+export type UpdatePost = z.infer<typeof postsUpdateSchema>;

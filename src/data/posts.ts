@@ -14,7 +14,7 @@ import { z } from "zod";
 export const getPosts = createServerFn()
 	.inputValidator(
 		z.object({
-			campaignId: z.string(),
+			campaignId: z.string().optional(),
 		}),
 	)
 	.handler(async ({ data }) => {

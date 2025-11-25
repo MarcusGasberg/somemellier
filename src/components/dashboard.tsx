@@ -10,13 +10,13 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useRouter } from "@tanstack/react-router";
 import { Button } from "./ui/button";
-import { PostCard } from "./post-card";
 import { AIPanel } from "./ai-panel";
-import { ChannelIcon } from "./channel-icon";
 import { ChannelConnectionModal } from "./channel-connection-modal";
 import { CampaignSelectorModal } from "./campaign-selector-modal";
 import { PostCreationModal } from "./post-creation-modal";
+import { ChannelsTimeline } from "./channels-timeline";
 import { userChannelCollection } from "@/hooks/use-user-channels";
 import { usePosts } from "@/hooks/use-posts";
 import { useCurrentCampaign, useCampaigns } from "@/hooks/use-campaigns";
@@ -34,6 +34,7 @@ interface User {
 interface DashboardProps {
 	user?: User;
 	onLogout: () => void;
+	campaignId?: string;
 }
 
 // Channels are now fetched from the API
@@ -64,8 +65,9 @@ const generateDates = (days = 14): DashboardDate[] => {
 };
 // Posts are now fetched from the API
 
-export const Dashboard = ({ user, onLogout }: DashboardProps) => {
+export const Dashboard = ({ user, onLogout, campaignId }: DashboardProps) => {
 	const { t } = useTranslation("dashboard");
+	const router = useRouter();
 	const [dates] = useState<DashboardDate[]>(() => generateDates(21));
 	const [isAiModalOpen, setAiModalOpen] = useState(false);
 	const [isChannelModalOpen, setChannelModalOpen] = useState(false);
@@ -77,13 +79,12 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const headerScrollRef = useRef<HTMLDivElement>(null);
 	const hasAttemptedDefaultCreation = useRef(false);
-	const { data: userChannels, isLoading: userChannelsIsLoading } = useLiveQuery(
-		(q) => q.from({ userChannels: userChannelCollection }),
+	const { data: userChannels } = useLiveQuery((q) =>
+		q.from({ userChannels: userChannelCollection }),
 	);
 	const { data: currentCampaignData, isLoading: isCurrentCampaignLoading } =
 		useCurrentCampaign();
 	const { data: allCampaigns = [] } = useCampaigns();
-	const { data: posts = [] } = usePosts(undefined, currentCampaign?.id);
 
 	useEffect(() => {
 		const bodyScroll = scrollContainerRef.current;
@@ -108,6 +109,16 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 	}, []);
 
 	useEffect(() => {
+		// If campaignId is provided in URL, find and set that campaign
+		if (campaignId && allCampaigns.length > 0 && !currentCampaign) {
+			const campaignFromUrl = allCampaigns.find((c) => c.id === campaignId);
+			if (campaignFromUrl) {
+				setCurrentCampaign(campaignFromUrl);
+				return;
+			}
+		}
+
+		// Otherwise, use the default campaign logic
 		if (
 			currentCampaignData &&
 			currentCampaignData.length > 0 &&
@@ -144,6 +155,8 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 				});
 		}
 	}, [
+		campaignId,
+		allCampaigns,
 		currentCampaignData,
 		currentCampaign,
 		isCurrentCampaignLoading,
@@ -160,6 +173,12 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 	const handleCampaignSelect = (campaign: Campaign) => {
 		setCurrentCampaign(campaign);
 		setCampaignModalOpen(false);
+		// Update URL with campaign ID
+		router.navigate({
+			to: "/dashboard",
+			search: { campaignId: campaign.id },
+			replace: true,
+		});
 	};
 
 	const handleEditPost = (post: Post) => {
@@ -369,170 +388,15 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 						className="flex-1 overflow-x-auto overflow-y-auto"
 						ref={scrollContainerRef}
 					>
-						<div className="flex flex-col min-w-max">
-							{userChannels.length === 0 && !userChannelsIsLoading ? (
-								<div className="flex-1 flex items-center justify-center min-h-[400px]">
-									<div className="text-center space-y-4">
-										<div className="text-6xl">📺</div>
-										<h3 className="text-xl font-semibold text-foreground">
-											{t("channels.empty.title")}
-										</h3>
-										<p className="text-muted-foreground max-w-md">
-											{t("channels.empty.description")}
-										</p>
-										<Button
-											onClick={() => setChannelModalOpen(true)}
-											className="mt-4"
-										>
-											<Plus className="w-4 h-4 mr-2" />
-											{t("channels.empty.connectButton")}
-										</Button>
-									</div>
-								</div>
-							) : (
-								userChannels.map((channel) => (
-									<div
-										key={channel.id}
-										className="flex border-b border-border min-h-[180px]"
-									>
-										{/* Channel Column (Sticky Left) */}
-										<div className="sticky left-0 w-48 shrink-0 bg-card border-r border-border p-4 z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
-											<div className="flex items-center gap-3 mb-2">
-												<div className="p-2 bg-secondary/40 rounded-lg border border-border">
-													<ChannelIcon iconKey={channel.iconKey} />
-												</div>
-												<span className="font-semibold text-foreground">
-													{channel.name}
-												</span>
-												{channel.accountId && (
-													<span className="text-xs text-muted-foreground bg-secondary px-2 py-1 rounded">
-														@{channel.accountId}
-													</span>
-												)}
-											</div>
-											<div className="text-xs text-muted-foreground pl-1">
-												{t("channels.postsScheduled")}
-											</div>
-										</div>
-
-										{/* Timeline Grid */}
-										<div
-											className="flex"
-											style={{
-												width: `${dates.length * 200 + (showDrafts ? 200 : 0)}px`,
-											}}
-										>
-											{showDrafts && (
-												<div className="w-[200px] shrink-0 p-3 border-r border-border relative group transition-colors bg-secondary/5">
-													<button
-														type="button"
-														className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-primary transition-all"
-													>
-														<Plus size={16} />
-													</button>
-
-													<div className="space-y-2">
-														{posts
-															.filter(
-																(p) =>
-																	p.channelId === channel.id &&
-																	p.status === "draft",
-															)
-															.map((post) => (
-																<div
-																	key={post.id}
-																	className="relative group/card"
-																>
-																	<PostCard
-																		post={{ ...post, type: post.postType }}
-																		onEdit={() => handleEditPost(post)}
-																	/>
-																</div>
-															))}
-													</div>
-
-													{posts.filter(
-														(p) =>
-															p.channelId === channel.id &&
-															p.status === "draft",
-													).length === 0 && (
-														<div className="h-full flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
-															<div className="text-muted-foreground text-xs border border-dashed border-border px-3 py-1 rounded-full">
-																{t("timeline.emptySlot")}
-															</div>
-														</div>
-													)}
-												</div>
-											)}
-											{dates.map((date) => {
-												const dayPosts = posts.filter(
-													(p) =>
-														p.channelId === channel.id &&
-														p.scheduledAt &&
-														p.scheduledAt.toISOString().split("T")[0] ===
-															date.iso,
-												);
-												const isToday = new Date().getDate() === date.dayNum;
-
-												return (
-													<div
-														key={`${channel.id}-${date.iso}`}
-														className={`w-[200px] shrink-0 p-3 border-r border-border relative group transition-colors hover:bg-secondary/10 ${isToday ? "bg-primary/5 hover:bg-secondary/30" : ""}`}
-													>
-														{/* Add Button (Hidden until hover) */}
-														<button
-															type="button"
-															className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-primary transition-all"
-														>
-															<Plus size={16} />
-														</button>
-
-														{/* Posts */}
-														<div className="space-y-2">
-															{dayPosts.map((post) => (
-																<div
-																	key={post.id}
-																	className="relative group/card"
-																>
-																	<PostCard
-																		post={{ ...post, type: post.postType }}
-																		onEdit={() => handleEditPost(post)}
-																	/>
-																</div>
-															))}
-														</div>
-
-														{/* Empty State Placeholder */}
-														{dayPosts.length === 0 && (
-															<div className="h-full flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
-																<div className="text-muted-foreground text-xs border border-dashed border-border px-3 py-1 rounded-full">
-																	{t("timeline.emptySlot")}
-																</div>
-															</div>
-														)}
-													</div>
-												);
-											})}
-										</div>
-									</div>
-								))
-							)}
-							{/* Add Channel Button */}
-							{userChannels.length !== 0 && (
-								<div className="flex border-b border-border min-h-[180px]">
-									{/* Channel Column (Sticky Left) */}
-									<div className="sticky left-0 w-48 shrink-0 bg-card border-r border-border p-4 z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
-										<button
-											type="button"
-											onClick={() => setChannelModalOpen(true)}
-											className="text-sm text-muted-foreground font-medium flex items-center justify-center gap-2 w-full h-full hover:text-primary hover:bg-primary/10 transition-colors duration-300 rounded-md"
-										>
-											<Plus className="w-8 h-8" />
-										</button>
-									</div>
-								</div>
-							)}
-						</div>
+						<ChannelsTimeline
+							userChannels={userChannels}
+							campaignId={campaignId}
+							dates={dates}
+							showDrafts={showDrafts}
+							onEditPost={handleEditPost}
+							onConnectChannel={() => setChannelModalOpen(true)}
+							t={t}
+						/>
 					</div>
 				</div>
 			</main>

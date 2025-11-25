@@ -29,10 +29,9 @@ export const postCollection = createCollection(
 				}
 			});
 
+			const campaignId = params.get("campaignId");
 			const posts = await getPosts({
-				data: {
-					campaignId: params.get("campaignId") || "",
-				},
+				data: campaignId ? { campaignId } : {},
 			});
 
 			return posts;
