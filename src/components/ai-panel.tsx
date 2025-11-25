@@ -10,7 +10,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { useForm, Field } from "@tanstack/react-form";
+import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 
 interface GeneratedPost {
@@ -29,8 +29,6 @@ const formSchema = z.object({
 	topic: z.string().min(1, "Campaign topic is required"),
 	tone: z.enum(["Professional", "Casual", "Excited", "Witty"]),
 });
-
-type FormData = z.infer<typeof formSchema>;
 
 export const AIPanel = ({ isOpen, onClose, onGenerate }: AIPanelProps) => {
 	const [loading, setLoading] = useState(false);
@@ -118,7 +116,7 @@ export const AIPanel = ({ isOpen, onClose, onGenerate }: AIPanelProps) => {
 								/>
 								{field.state.meta.errors.length > 0 && (
 									<p className="text-sm text-destructive mt-1">
-										{field.state.meta.errors[0]}
+										{field.state.meta.errors[0]?.message || "Invalid input"}
 									</p>
 								)}
 							</div>
@@ -134,7 +132,7 @@ export const AIPanel = ({ isOpen, onClose, onGenerate }: AIPanelProps) => {
 								</Label>
 								<Select
 									value={field.state.value}
-									onValueChange={field.handleChange}
+									onValueChange={(value) => field.handleChange(value as any)}
 								>
 									<SelectTrigger className="w-full">
 										<SelectValue />
@@ -152,8 +150,8 @@ export const AIPanel = ({ isOpen, onClose, onGenerate }: AIPanelProps) => {
 
 					<div className="pt-4">
 						<form.Subscribe
-							selector={(state) => [state.canSubmit, state.isSubmitting]}
-							children={([canSubmit, isSubmitting]) => (
+							selector={(state) => [state.canSubmit]}
+							children={([canSubmit]) => (
 								<Button
 									type="submit"
 									variant="default"

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { X, Calendar, Hash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/date-picker";
@@ -14,11 +14,11 @@ import {
 } from "@/components/ui/select";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
-import { useUserChannels } from "@/hooks/use-user-channels";
 import { ChannelIcon } from "./channel-icon";
 import type { Campaign } from "@/db/schema/campaigns-schema";
 import { postCollection } from "@/hooks/use-posts";
-import { Post } from "../db/schema/posts-schema";
+import type { Post } from "../data/posts";
+import type { UserChannel } from "../data/user-channels";
 
 interface PostCreationModalProps {
 	isOpen: boolean;
@@ -32,6 +32,7 @@ interface PostCreationModalProps {
 	currentCampaign: Campaign;
 	editMode?: boolean;
 	postToEdit?: Post;
+	userChannels: UserChannel[];
 }
 
 export const PostCreationModal = ({
@@ -43,15 +44,15 @@ export const PostCreationModal = ({
 	userId,
 	editMode = false,
 	postToEdit,
+	userChannels,
 }: PostCreationModalProps) => {
 	const [loading, setLoading] = useState(false);
-	const { data: userChannels = [] } = useUserChannels();
 
 	const form = useForm({
 		defaultValues: {
 			content: postToEdit?.content || "",
 			channelId: postToEdit?.channelId || prefillData?.channelId || "",
-			postType: (postToEdit?.postType as any) || "thought-leadership",
+			postType: postToEdit?.postType || "thought-leadership",
 			scheduledAt:
 				postToEdit?.scheduledAt || prefillData?.scheduledAt || undefined,
 			title: postToEdit?.title || "",
@@ -60,7 +61,7 @@ export const PostCreationModal = ({
 			setLoading(true);
 			try {
 				if (editMode && postToEdit) {
-					const updatedPostData = {
+					const updatedPostData: Post = {
 						...postToEdit,
 						channelId: value.channelId,
 						postType: value.postType,
@@ -71,13 +72,12 @@ export const PostCreationModal = ({
 						status: value.scheduledAt ? "scheduled" : "draft",
 					};
 
-					console.log("Updating ", updatedPostData);
 					postCollection.update(updatedPostData.id, (draft) => {
 						Object.assign(draft, updatedPostData);
 					});
-					onCreatePost(updatedPostData as Post); // Reusing onCreatePost for update callback
+					onCreatePost(updatedPostData);
 				} else {
-					const postData = {
+					const postData: Post = {
 						campaignId: currentCampaign.id,
 						channelId: value.channelId,
 						postType: value.postType,
@@ -95,7 +95,6 @@ export const PostCreationModal = ({
 						analytics: null,
 					};
 
-					console.log("Inserting ", postData);
 					postCollection.insert(postData);
 					onCreatePost(postData);
 				}
@@ -109,6 +108,18 @@ export const PostCreationModal = ({
 			}
 		},
 	});
+
+	useEffect(() => {
+		if (isOpen && editMode && postToEdit) {
+			form.reset({
+				content: postToEdit.content,
+				channelId: postToEdit.channelId,
+				postType: postToEdit.postType,
+				scheduledAt: postToEdit.scheduledAt || undefined,
+				title: postToEdit.title ?? "",
+			});
+		}
+	}, [isOpen, editMode, postToEdit, form]);
 
 	if (!isOpen) return null;
 
@@ -220,11 +231,12 @@ export const PostCreationModal = ({
 						children={(field) => (
 							<div>
 								<Label className="block text-sm font-medium text-foreground mb-1">
-									Channel
+									Channel {field.state.value}
 								</Label>
 								<Select
-									value={field.state.value}
-									onValueChange={(value) => field.handleChange(() => value)}
+									defaultValue={postToEdit?.channelId ?? prefillData?.channelId}
+									name={field.name}
+									onValueChange={(value) => field.handleChange(value)}
 								>
 									<SelectTrigger className="w-full">
 										<SelectValue placeholder="Select a channel" />
@@ -265,9 +277,7 @@ export const PostCreationModal = ({
 								</Label>
 								<Select
 									value={field.state.value}
-									onValueChange={(value) =>
-										field.handleChange(() => value as any)
-									}
+									onValueChange={(value) => field.handleChange(value)}
 								>
 									<SelectTrigger className="w-full">
 										<SelectValue />

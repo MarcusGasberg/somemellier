@@ -80,7 +80,8 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 	const { data: userChannels, isLoading: userChannelsIsLoading } = useLiveQuery(
 		(q) => q.from({ userChannels: userChannelCollection }),
 	);
-	const { data: currentCampaignData } = useCurrentCampaign();
+	const { data: currentCampaignData, isLoading: isCurrentCampaignLoading } =
+		useCurrentCampaign();
 	const { data: allCampaigns = [] } = useCampaigns();
 	const { data: posts = [] } = usePosts(undefined, currentCampaign?.id);
 
@@ -114,6 +115,7 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 		) {
 			setCurrentCampaign(currentCampaignData[0]);
 		} else if (
+			!isCurrentCampaignLoading &&
 			currentCampaignData.length === 0 &&
 			user?.id &&
 			!currentCampaign &&
@@ -141,7 +143,12 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 					hasAttemptedDefaultCreation.current = false; // Reset on error to allow retry
 				});
 		}
-	}, [currentCampaignData, currentCampaign, allCampaigns, user?.id]);
+	}, [
+		currentCampaignData,
+		currentCampaign,
+		isCurrentCampaignLoading,
+		user?.id,
+	]);
 
 	const handleAiGeneration = (
 		generatedPosts: { channelId: string; content: string; type: string }[],
@@ -550,6 +557,7 @@ export const Dashboard = ({ user, onLogout }: DashboardProps) => {
 				<PostCreationModal
 					isOpen={isPostModalOpen}
 					onClose={() => setPostModalOpen(false)}
+					userChannels={userChannels}
 					onCreatePost={() => {
 						// Post creation/update is handled by the collection
 						// We just need to close the modal, which is handled by onClose in the modal

@@ -28,7 +28,6 @@ export const ChannelConnectionModal = ({
 	const handleConnect = async (channel: Channel) => {
 		setConnectingChannelId(channel.id);
 		try {
-			console.log(channel);
 			userChannelCollection.insert({
 				id: crypto.randomUUID(),
 				createdAt: new Date(),
@@ -48,8 +47,6 @@ export const ChannelConnectionModal = ({
 			setConnectingChannelId(null);
 		}
 	};
-
-	console.log(availableChannels);
 
 	return (
 		<Dialog open={isOpen} onOpenChange={onClose}>

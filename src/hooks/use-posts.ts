@@ -6,7 +6,8 @@ import {
 } from "@tanstack/react-db";
 import { queryCollectionOptions } from "@tanstack/query-db-collection";
 import { useLiveQuery } from "@tanstack/react-db";
-import { Post } from "@/db/schema/posts-schema";
+import type { Post } from "@/db/schema/posts-schema";
+import { createPost, getPosts, updatePost } from "@/data/posts";
 
 const queryClient = new QueryClient();
 
@@ -28,17 +29,13 @@ export const postCollection = createCollection(
 				}
 			});
 
-			const response = await fetch(`/api/posts?${params.toString()}`, {
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json",
+			const posts = await getPosts({
+				data: {
+					campaignId: params.get("campaignId") || "",
 				},
 			});
-			if (!response.ok) {
-				throw new Error("Failed to fetch posts");
-			}
-			const data = (await response.json()) as { posts: Post[] };
-			return data.posts;
+
+			return posts;
 		},
 		queryClient,
 		getKey: (item) => item.id,
@@ -46,12 +43,8 @@ export const postCollection = createCollection(
 			try {
 				await Promise.all(
 					transaction.mutations.map((mutation) =>
-						fetch("/api/posts", {
-							method: "POST",
-							headers: {
-								"Content-Type": "application/json",
-							},
-							body: JSON.stringify(mutation.modified),
+						createPost({
+							data: mutation.modified,
 						}),
 					),
 				);
@@ -63,12 +56,8 @@ export const postCollection = createCollection(
 			try {
 				await Promise.all(
 					transaction.mutations.map((mutation) =>
-						fetch("/api/posts", {
-							method: "PUT",
-							headers: {
-								"Content-Type": "application/json",
-							},
-							body: JSON.stringify(mutation.modified),
+						updatePost({
+							data: mutation.modified,
 						}),
 					),
 				);

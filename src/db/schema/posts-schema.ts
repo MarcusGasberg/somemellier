@@ -38,15 +38,15 @@ export const posts = pgTable("posts", {
 	content: text("content").notNull(),
 	status: postStatusEnum("status").default("draft").notNull(),
 	postType: text("post_type").notNull(),
-	scheduledAt: timestamp("scheduled_at"),
-	publishedAt: timestamp("published_at"),
+	scheduledAt: timestamp("scheduled_at", { mode: "date" }),
+	publishedAt: timestamp("published_at", { mode: "date" }),
 	metadata: jsonb("metadata").$type<Record<string, any>>().default({}),
 	mediaAttachments: jsonb("media_attachments")
 		.$type<Array<Record<string, any>>>()
 		.default([]),
 	analytics: jsonb("analytics").$type<Record<string, any>>().default({}),
-	createdAt: timestamp("created_at").defaultNow().notNull(),
-	updatedAt: timestamp("updated_at")
+	createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+	updatedAt: timestamp("updated_at", { mode: "date" })
 		.defaultNow()
 		.$onUpdate(() => new Date())
 		.notNull(),
@@ -65,18 +65,40 @@ export const postVersions = pgTable("post_versions", {
 
 // Zod schemas
 export const postsSelectSchema = createSelectSchema(posts);
-export const postsInsertSchema = createInsertSchema(posts);
-export const postsUpdateSchema = createUpdateSchema(posts);
-
-export const postVersionsSelectSchema = createSelectSchema(postVersions);
-export const postVersionsInsertSchema = createInsertSchema(postVersions);
-export const postVersionsUpdateSchema = createUpdateSchema(postVersions);
-
-// Types
-export type Post = z.infer<typeof postsSelectSchema>;
-export type NewPost = z.infer<typeof postsInsertSchema>;
-export type UpdatePost = z.infer<typeof postsUpdateSchema>;
-
-export type PostVersion = z.infer<typeof postVersionsSelectSchema>;
-export type NewPostVersion = z.infer<typeof postVersionsInsertSchema>;
-export type UpdatePostVersion = z.infer<typeof postVersionsUpdateSchema>;
+export const postsInsertSchema = createInsertSchema(posts).extend({
+	createdAt: z
+		.union([z.date(), z.string()])
+		.transform((val) => (typeof val === "string" ? new Date(val) : val)),
+	updatedAt: z
+		.union([z.date(), z.string()])
+		.transform((val) => (typeof val === "string" ? new Date(val) : val)),
+	scheduledAt: z
+		.union([z.date(), z.string(), z.null()])
+		.transform((val) =>
+			val === null ? null : typeof val === "string" ? new Date(val) : val,
+		),
+	publishedAt: z
+		.union([z.date(), z.string(), z.null()])
+		.transform((val) =>
+			val === null ? null : typeof val === "string" ? new Date(val) : val,
+		),
+});
+export const postsUpdateSchema = createUpdateSchema(posts).extend({
+	id: z.string(),
+	createdAt: z
+		.union([z.date(), z.string()])
+		.transform((val) => (typeof val === "string" ? new Date(val) : val)),
+	updatedAt: z
+		.union([z.date(), z.string()])
+		.transform((val) => (typeof val === "string" ? new Date(val) : val)),
+	scheduledAt: z
+		.union([z.date(), z.string(), z.null()])
+		.transform((val) =>
+			val === null ? null : typeof val === "string" ? new Date(val) : val,
+		),
+	publishedAt: z
+		.union([z.date(), z.string(), z.null()])
+		.transform((val) =>
+			val === null ? null : typeof val === "string" ? new Date(val) : val,
+		),
+});

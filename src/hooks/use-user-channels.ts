@@ -3,24 +3,16 @@ import { createCollection, useLiveQuery } from "@tanstack/react-db";
 import { eq, isUndefined } from "@tanstack/db";
 
 import { queryCollectionOptions } from "@tanstack/query-db-collection";
-import { userChannelsSelectSchema } from "@/db/schema/channels-schema";
 import { channelCollection } from "./use-channels";
+import { getUserChannels } from "@/data/user-channels";
 
 const queryClient = new QueryClient();
 
 export const userChannelCollection = createCollection(
 	queryCollectionOptions({
-		schema: userChannelsSelectSchema,
 		queryKey: ["user-channels"],
 		queryFn: async () => {
-			const res = await fetch("/api/user-channels");
-			if (!res.ok) {
-				return [];
-			}
-
-			const objs = (await res.json()) as any;
-			console.log(objs);
-			return objs;
+			return await getUserChannels();
 		},
 		queryClient,
 		getKey: (item) => item.id,

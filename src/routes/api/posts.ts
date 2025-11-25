@@ -53,7 +53,6 @@ export const Route = createFileRoute("/api/posts")({
 			},
 			POST: async ({ request }) => {
 				try {
-					console.error("GOT REQUEST", request);
 					const session = await auth.api.getSession({
 						headers: request.headers,
 					});
