@@ -1,10 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { db } from "@/db";
-import {
-	channels,
-	userChannels,
-	userChannelsInsertSchema,
-} from "@/db/schema/channels-schema";
+import { channels, userChannels } from "@/db/schema/channels-schema";
 import { auth } from "@/lib/auth";
 import { eq, and } from "drizzle-orm";
 
