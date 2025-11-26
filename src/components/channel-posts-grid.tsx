@@ -3,6 +3,7 @@ import { PostCard } from "./post-card";
 import type { Post } from "@/db/schema/posts-schema";
 import { isSameDay } from "date-fns";
 import { usePosts } from "@/hooks/use-posts";
+import { PostCreationModalPrefillData } from "./post-creation-modal";
 
 interface DashboardDate {
 	full: Date;
@@ -18,6 +19,7 @@ interface ChannelPostsGridProps {
 	dates: DashboardDate[];
 	showDrafts: boolean;
 	onEditPost: (post: Post) => void;
+	onAddPost: (prefill: PostCreationModalPrefillData) => void;
 	t: (key: string) => string;
 }
 
@@ -27,6 +29,7 @@ export const ChannelPostsGrid = ({
 	dates,
 	showDrafts,
 	onEditPost,
+	onAddPost,
 	t,
 }: ChannelPostsGridProps) => {
 	const { data: posts = [] } = usePosts(channelId, campaignId);
@@ -82,6 +85,7 @@ export const ChannelPostsGrid = ({
 						{/* Add Button (Hidden until hover) */}
 						<button
 							type="button"
+							onClick={() => onAddPost({ channelId, scheduledAt: date.full })}
 							className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-primary transition-all"
 						>
 							<Plus size={16} />

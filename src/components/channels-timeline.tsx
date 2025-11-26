@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 import { ChannelPostsGrid } from "./channel-posts-grid";
 import type { UserChannel } from "@/data/user-channels";
 import type { Post } from "@/db/schema/posts-schema";
+import { PostCreationModalPrefillData } from "./post-creation-modal";
 
 interface DashboardDate {
 	full: Date;
@@ -19,6 +20,7 @@ interface ChannelsTimelineProps {
 	dates: DashboardDate[];
 	showDrafts: boolean;
 	onEditPost: (post: Post) => void;
+	onAddPost: (prefillData: PostCreationModalPrefillData) => void;
 	onConnectChannel: () => void;
 	t: (...args: any[]) => string;
 }
@@ -29,6 +31,7 @@ export const ChannelsTimeline = ({
 	showDrafts,
 	campaignId,
 	onEditPost,
+	onAddPost,
 	onConnectChannel,
 	t,
 }: ChannelsTimelineProps) => {
@@ -82,6 +85,7 @@ export const ChannelsTimeline = ({
 							campaignId={campaignId}
 							dates={dates}
 							showDrafts={showDrafts}
+							onAddPost={onAddPost}
 							onEditPost={onEditPost}
 							t={t}
 						/>

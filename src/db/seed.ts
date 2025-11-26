@@ -2,10 +2,14 @@ import { config } from "dotenv";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { channels } from "./schema/channels-schema";
+import { must } from "@/lib/must";
 
 config();
 
-const connectionString = process.env.DATABASE_URL!;
+const connectionString = must(
+	process.env.DATABASE_URL,
+	"DATABASE_URL environment variable is not set",
+);
 const sql = neon(connectionString);
 const db = drizzle({ client: sql });
 

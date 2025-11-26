@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useState } from "react";
+import { useEffect, useState } from "react";
 import { X, Calendar, Hash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/date-picker";
@@ -25,14 +25,16 @@ interface PostCreationModalProps {
 	userId: string;
 	onClose: () => void;
 	onCreatePost: (post: Post) => void;
-	prefillData?: {
-		channelId?: string;
-		scheduledAt?: Date;
-	};
+	prefillData?: PostCreationModalPrefillData;
 	currentCampaign: Campaign;
 	editMode?: boolean;
 	postToEdit?: Post;
 	userChannels: UserChannel[];
+}
+
+export interface PostCreationModalPrefillData {
+	channelId?: string;
+	scheduledAt?: Date;
 }
 
 export const PostCreationModal = ({
@@ -81,7 +83,7 @@ export const PostCreationModal = ({
 						campaignId: currentCampaign.id,
 						channelId: value.channelId,
 						postType: value.postType,
-						status: "draft" as const,
+						status: value.scheduledAt ? "scheduled" : "draft",
 						content: value.content,
 						createdAt: new Date(),
 						id: crypto.randomUUID(),
@@ -305,7 +307,7 @@ export const PostCreationModal = ({
 								</Label>
 								<div className="flex gap-2">
 									<DatePicker
-										date={field.state.value}
+										date={field.state.value ?? prefillData?.scheduledAt}
 										setDate={(date) => field.handleChange(date)}
 										className="flex-1 w-auto"
 									/>

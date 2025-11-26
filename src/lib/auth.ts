@@ -10,6 +10,7 @@ const betterAuthSecret = must(
 	"BETTER_AUTH_SECRET must be set",
 );
 
+console.log("Initializing better-auth...");
 export const auth = betterAuth({
 	secret: betterAuthSecret,
 	socialProviders: {

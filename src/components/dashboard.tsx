@@ -8,17 +8,19 @@ import {
 	Settings,
 	Sparkles,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "@tanstack/react-router";
 import { Button } from "./ui/button";
 import { AIPanel } from "./ai-panel";
 import { ChannelConnectionModal } from "./channel-connection-modal";
 import { CampaignSelectorModal } from "./campaign-selector-modal";
-import { PostCreationModal } from "./post-creation-modal";
+import {
+	PostCreationModal,
+	PostCreationModalPrefillData,
+} from "./post-creation-modal";
 import { ChannelsTimeline } from "./channels-timeline";
 import { userChannelCollection } from "@/hooks/use-user-channels";
-import { usePosts } from "@/hooks/use-posts";
 import { useCurrentCampaign, useCampaigns } from "@/hooks/use-campaigns";
 import { useLiveQuery } from "@tanstack/react-db";
 import type { Campaign } from "@/db/schema/campaigns-schema";
@@ -73,6 +75,8 @@ export const Dashboard = ({ user, onLogout, campaignId }: DashboardProps) => {
 	const [isChannelModalOpen, setChannelModalOpen] = useState(false);
 	const [isCampaignModalOpen, setCampaignModalOpen] = useState(false);
 	const [isPostModalOpen, setPostModalOpen] = useState(false);
+	const [prefillCreateData, setPrefillCreateData] =
+		useState<PostCreationModalPrefillData | null>(null);
 	const [currentCampaign, setCurrentCampaign] = useState<Campaign | null>(null);
 	const [showDrafts, setShowDrafts] = useState(false);
 	const [editingPost, setEditingPost] = useState<Post | null>(null);
@@ -163,6 +167,12 @@ export const Dashboard = ({ user, onLogout, campaignId }: DashboardProps) => {
 		user?.id,
 	]);
 
+	useEffect(() => {
+		if (!isPostModalOpen) {
+			setPrefillCreateData(null);
+		}
+	}, [isPostModalOpen]);
+
 	const handleAiGeneration = (
 		generatedPosts: { channelId: string; content: string; type: string }[],
 	) => {
@@ -186,8 +196,9 @@ export const Dashboard = ({ user, onLogout, campaignId }: DashboardProps) => {
 		setPostModalOpen(true);
 	};
 
-	const handleCreatePost = () => {
+	const handleCreatePost = (prefillData: PostCreationModalPrefillData) => {
 		setEditingPost(null);
+		setPrefillCreateData(prefillData);
 		setPostModalOpen(true);
 	};
 
@@ -394,6 +405,7 @@ export const Dashboard = ({ user, onLogout, campaignId }: DashboardProps) => {
 							dates={dates}
 							showDrafts={showDrafts}
 							onEditPost={handleEditPost}
+							onAddPost={handleCreatePost}
 							onConnectChannel={() => setChannelModalOpen(true)}
 							t={t}
 						/>
@@ -422,6 +434,7 @@ export const Dashboard = ({ user, onLogout, campaignId }: DashboardProps) => {
 					isOpen={isPostModalOpen}
 					onClose={() => setPostModalOpen(false)}
 					userChannels={userChannels}
+					prefillData={prefillCreateData ?? undefined}
 					onCreatePost={() => {
 						// Post creation/update is handled by the collection
 						// We just need to close the modal, which is handled by onClose in the modal
