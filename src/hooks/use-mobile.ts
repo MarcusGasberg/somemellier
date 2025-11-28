@@ -19,3 +19,19 @@ export function useIsMobile() {
 
 	return !!isMobile;
 }
+
+export function useColumnWidth() {
+	const [columnWidth, setColumnWidth] = React.useState(200);
+
+	React.useEffect(() => {
+		const updateColumnWidth = () => {
+			setColumnWidth(window.innerWidth < MOBILE_BREAKPOINT ? 120 : 200);
+		};
+
+		updateColumnWidth();
+		window.addEventListener("resize", updateColumnWidth);
+		return () => window.removeEventListener("resize", updateColumnWidth);
+	}, []);
+
+	return columnWidth;
+}

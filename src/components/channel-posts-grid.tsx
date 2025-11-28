@@ -18,6 +18,7 @@ interface ChannelPostsGridProps {
 	campaignId: string | undefined;
 	dates: DashboardDate[];
 	showDrafts: boolean;
+	columnWidth?: number;
 	onEditPost: (post: Post) => void;
 	onAddPost: (prefill: PostCreationModalPrefillData) => void;
 	t: (key: string) => string;
@@ -28,6 +29,7 @@ export const ChannelPostsGrid = ({
 	campaignId,
 	dates,
 	showDrafts,
+	columnWidth = 200,
 	onEditPost,
 	onAddPost,
 	t,
@@ -37,11 +39,14 @@ export const ChannelPostsGrid = ({
 		<div
 			className="flex"
 			style={{
-				width: `${dates.length * 200 + (showDrafts ? 200 : 0)}px`,
+				width: `${dates.length * columnWidth + (showDrafts ? columnWidth : 0)}px`,
 			}}
 		>
 			{showDrafts && (
-				<div className="w-[200px] shrink-0 p-3 border-r border-border relative group transition-colors bg-secondary/5">
+				<div
+					className="shrink-0 p-3 border-r border-border relative group transition-colors bg-secondary/5"
+					style={{ width: `${columnWidth}px` }}
+				>
 					<button
 						type="button"
 						className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-primary transition-all"
@@ -80,7 +85,8 @@ export const ChannelPostsGrid = ({
 				return (
 					<div
 						key={`${channelId}-${date.iso}`}
-						className={`w-[200px] shrink-0 p-3 border-r border-border relative group transition-colors hover:bg-secondary/10 ${isToday ? "bg-primary/5 hover:bg-secondary/30" : ""}`}
+						className={`shrink-0 p-3 border-r border-border relative group transition-colors hover:bg-secondary/10 ${isToday ? "bg-primary/5 hover:bg-secondary/30" : ""}`}
+						style={{ width: `${columnWidth}px` }}
 					>
 						{/* Add Button (Hidden until hover) */}
 						<button

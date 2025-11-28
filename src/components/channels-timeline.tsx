@@ -19,6 +19,7 @@ interface ChannelsTimelineProps {
 	campaignId: string | undefined;
 	dates: DashboardDate[];
 	showDrafts: boolean;
+	columnWidth?: number;
 	onEditPost: (post: Post) => void;
 	onAddPost: (prefillData: PostCreationModalPrefillData) => void;
 	onConnectChannel: () => void;
@@ -30,6 +31,7 @@ export const ChannelsTimeline = ({
 	dates,
 	showDrafts,
 	campaignId,
+	columnWidth = 200,
 	onEditPost,
 	onAddPost,
 	onConnectChannel,
@@ -60,7 +62,7 @@ export const ChannelsTimeline = ({
 						className="flex border-b border-border min-h-[180px]"
 					>
 						{/* Channel Column (Sticky Left) */}
-						<div className="sticky left-0 w-48 shrink-0 bg-card border-r border-border p-4 z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+						<div className="sticky left-0 w-32 md:w-48 shrink-0 bg-card border-r border-border p-3 md:p-4 z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
 							<div className="flex items-center gap-3 mb-2">
 								<div className="p-2 bg-secondary/40 rounded-lg border border-border">
 									<ChannelIcon iconKey={channel.iconKey} />
@@ -85,6 +87,7 @@ export const ChannelsTimeline = ({
 							campaignId={campaignId}
 							dates={dates}
 							showDrafts={showDrafts}
+							columnWidth={columnWidth}
 							onAddPost={onAddPost}
 							onEditPost={onEditPost}
 							t={t}
@@ -96,7 +99,7 @@ export const ChannelsTimeline = ({
 			{userChannels.length !== 0 && (
 				<div className="flex border-b border-border min-h-[180px]">
 					{/* Channel Column (Sticky Left) */}
-					<div className="sticky left-0 w-48 shrink-0 bg-card border-r border-border p-4 z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+					<div className="sticky left-0 w-32 md:w-48 shrink-0 bg-card border-r border-border p-3 md:p-4 z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
 						<button
 							type="button"
 							onClick={onConnectChannel}
