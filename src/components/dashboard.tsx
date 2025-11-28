@@ -104,19 +104,38 @@ export const Dashboard = ({ user, onLogout, campaignId }: DashboardProps) => {
 		if (!bodyScroll || !headerScroll) return;
 
 		let ticking = false;
+		let isScrollingBody = false;
+		let isScrollingHeader = false;
 
 		const syncScroll = (source: HTMLElement, target: HTMLElement) => {
 			if (!ticking) {
+				ticking = true;
 				requestAnimationFrame(() => {
 					target.scrollLeft = source.scrollLeft;
 					ticking = false;
 				});
-				ticking = true;
 			}
 		};
 
-		const handleBodyScroll = () => syncScroll(bodyScroll, headerScroll);
-		const handleHeaderScroll = () => syncScroll(headerScroll, bodyScroll);
+		const handleBodyScroll = () => {
+			if (!isScrollingHeader) {
+				isScrollingBody = true;
+				syncScroll(bodyScroll, headerScroll);
+				setTimeout(() => {
+					isScrollingBody = false;
+				}, 100);
+			}
+		};
+
+		const handleHeaderScroll = () => {
+			if (!isScrollingBody) {
+				isScrollingHeader = true;
+				syncScroll(headerScroll, bodyScroll);
+				setTimeout(() => {
+					isScrollingHeader = false;
+				}, 100);
+			}
+		};
 
 		bodyScroll.addEventListener("scroll", handleBodyScroll, { passive: true });
 		headerScroll.addEventListener("scroll", handleHeaderScroll, {
@@ -458,8 +477,8 @@ export const Dashboard = ({ user, onLogout, campaignId }: DashboardProps) => {
 							className="flex-1 overflow-x-auto overflow-y-hidden scrollbar-hide"
 							ref={headerScrollRef}
 							style={{
-								scrollBehavior: "smooth",
 								WebkitOverflowScrolling: "touch",
+								touchAction: "pan-x pan-y",
 							}}
 						>
 							<div
@@ -522,8 +541,8 @@ export const Dashboard = ({ user, onLogout, campaignId }: DashboardProps) => {
 						className="flex-1 overflow-x-auto overflow-y-auto scrollbar-hide"
 						ref={scrollContainerRef}
 						style={{
-							scrollBehavior: "smooth",
 							WebkitOverflowScrolling: "touch",
+							touchAction: "pan-x pan-y",
 						}}
 					>
 						<ChannelsTimeline
