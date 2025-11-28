@@ -63,11 +63,11 @@ export const ChannelsTimeline = ({
 					>
 						{/* Channel Column (Sticky Left) */}
 						<div className="sticky left-0 w-32 md:w-48 shrink-0 bg-card border-r border-border p-3 md:p-4 z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
-							<div className="flex items-center gap-3 mb-2">
-								<div className="p-2 bg-secondary/40 rounded-lg border border-border">
+							<div className="md:flex items-center gap-3 mb-2">
+								<div className="w-fit max-md:mb-2 p-2 bg-secondary/10 rounded-lg border border-border">
 									<ChannelIcon iconKey={channel.iconKey} />
 								</div>
-								<span className="font-semibold text-foreground">
+								<span className="max-md:mb-4 font-semibold text-foreground">
 									{channel.name}
 								</span>
 								{channel.accountId && (
@@ -76,7 +76,7 @@ export const ChannelsTimeline = ({
 									</span>
 								)}
 							</div>
-							<div className="text-xs text-muted-foreground pl-1">
+							<div className="text-xs text-muted-foreground md:pl-1">
 								{t("channels.postsScheduled")}
 							</div>
 						</div>
