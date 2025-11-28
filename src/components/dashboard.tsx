@@ -104,8 +104,6 @@ export const Dashboard = ({ user, onLogout, campaignId }: DashboardProps) => {
 		if (!bodyScroll || !headerScroll) return;
 
 		let ticking = false;
-		let isScrollingBody = false;
-		let isScrollingHeader = false;
 
 		const syncScroll = (source: HTMLElement, target: HTMLElement) => {
 			if (!ticking) {
@@ -118,23 +116,11 @@ export const Dashboard = ({ user, onLogout, campaignId }: DashboardProps) => {
 		};
 
 		const handleBodyScroll = () => {
-			if (!isScrollingHeader) {
-				isScrollingBody = true;
-				syncScroll(bodyScroll, headerScroll);
-				setTimeout(() => {
-					isScrollingBody = false;
-				}, 100);
-			}
+			syncScroll(bodyScroll, headerScroll);
 		};
 
 		const handleHeaderScroll = () => {
-			if (!isScrollingBody) {
-				isScrollingHeader = true;
-				syncScroll(headerScroll, bodyScroll);
-				setTimeout(() => {
-					isScrollingHeader = false;
-				}, 100);
-			}
+			syncScroll(headerScroll, bodyScroll);
 		};
 
 		bodyScroll.addEventListener("scroll", handleBodyScroll, { passive: true });
