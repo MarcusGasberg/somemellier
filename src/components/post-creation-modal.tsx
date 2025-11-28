@@ -300,32 +300,58 @@ export const PostCreationModal = ({
 					{/* Schedule Date/Time */}
 					<form.Field
 						name="scheduledAt"
-						children={(field) => (
-							<div>
-								<Label className="block text-sm font-medium text-foreground mb-1">
-									Schedule (Optional)
-								</Label>
-								<div className="flex gap-2">
-									<DatePicker
-										date={field.state.value ?? prefillData?.scheduledAt}
-										setDate={(date) => field.handleChange(date)}
-										className="flex-1 w-auto"
-									/>
-									<Button
-										type="button"
-										variant="outline"
-										size="icon"
-										onClick={() => field.handleChange(undefined)}
-										title="Clear schedule"
-									>
-										<X size={16} />
-									</Button>
+						validators={{
+							onChange: (value) => {
+								if (value && value.value) {
+									const today = new Date();
+									today.setHours(0, 0, 0, 0);
+									const selectedDate = new Date(value.value);
+									selectedDate.setHours(0, 0, 0, 0);
+									if (selectedDate < today) {
+										return "Cannot schedule posts in the past";
+									}
+								}
+								return undefined;
+							},
+						}}
+						children={(field) => {
+							const today = new Date();
+							today.setHours(0, 0, 0, 0);
+
+							return (
+								<div>
+									<Label className="block text-sm font-medium text-foreground mb-1">
+										Schedule (Optional)
+									</Label>
+									<div className="flex gap-2">
+										<DatePicker
+											date={field.state.value ?? prefillData?.scheduledAt}
+											setDate={(date) => field.handleChange(date)}
+											className="flex-1 w-auto"
+											fromDate={today}
+										/>
+										<Button
+											type="button"
+											variant="outline"
+											size="icon"
+											onClick={() => field.handleChange(undefined)}
+											title="Clear schedule"
+										>
+											<X size={16} />
+										</Button>
+									</div>
+									{field.state.meta.errors.length > 0 ? (
+										<p className="text-xs text-destructive mt-1">
+											{field.state.meta.errors[0]}
+										</p>
+									) : (
+										<p className="text-xs text-muted-foreground mt-1">
+											Leave empty to save as draft
+										</p>
+									)}
 								</div>
-								<p className="text-xs text-muted-foreground mt-1">
-									Leave empty to save as draft
-								</p>
-							</div>
-						)}
+							);
+						}}
 					/>
 
 					{/* Submit Button */}
