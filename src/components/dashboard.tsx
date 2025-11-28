@@ -103,15 +103,25 @@ export const Dashboard = ({ user, onLogout, campaignId }: DashboardProps) => {
 
 		if (!bodyScroll || !headerScroll) return;
 
+		let ticking = false;
+
 		const syncScroll = (source: HTMLElement, target: HTMLElement) => {
-			target.scrollLeft = source.scrollLeft;
+			if (!ticking) {
+				requestAnimationFrame(() => {
+					target.scrollLeft = source.scrollLeft;
+					ticking = false;
+				});
+				ticking = true;
+			}
 		};
 
 		const handleBodyScroll = () => syncScroll(bodyScroll, headerScroll);
 		const handleHeaderScroll = () => syncScroll(headerScroll, bodyScroll);
 
-		bodyScroll.addEventListener("scroll", handleBodyScroll);
-		headerScroll.addEventListener("scroll", handleHeaderScroll);
+		bodyScroll.addEventListener("scroll", handleBodyScroll, { passive: true });
+		headerScroll.addEventListener("scroll", handleHeaderScroll, {
+			passive: true,
+		});
 
 		return () => {
 			bodyScroll.removeEventListener("scroll", handleBodyScroll);
